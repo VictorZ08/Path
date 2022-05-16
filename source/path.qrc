@@ -1,0 +1,11 @@
+<RCC>
+    <qresource prefix="/">
+        <file>../image/bad.png</file>
+        <file>../image/button_back.png</file>
+        <file>../image/exel.png</file>
+        <file>../image/folder.png</file>
+        <file>../image/text.png</file>
+        <file>../image/woodbackground.png</file>
+        <file>../image/woodbutton.png</file>
+    </qresource>
+</RCC>
