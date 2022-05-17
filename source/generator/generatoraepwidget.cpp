@@ -160,7 +160,7 @@ void GeneratorAepWidget::m_start_pb_clicked()
 {
     Set& sets = getSetsInTree();
     for(auto& set: sets.getSetsAep())
-        swapFilesToComplectAep(set);
+        sortFilesToComplectAep(set);
 
     QVector<pairFiFiL>::iterator itSets = sets.getSetsAep().begin();//Добавить итератор
     quint64 numberSets = ui->m_numSets_le->text().toInt();
