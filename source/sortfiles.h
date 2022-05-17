@@ -6,7 +6,7 @@
 /**
     @author Victor Zaytcev
 */
-void swapFilesToComplectAep(pairFiFiL& inFiles);
+void sortFilesToComplectAep(pairFiFiL& inFiles);
 void shuffleExelFilesPemi(QFileInfoList& inFiles);
 
 #endif // SORTFILES_H

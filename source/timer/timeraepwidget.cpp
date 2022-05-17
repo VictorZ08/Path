@@ -112,7 +112,7 @@ void TimerAepWidget::m_start_pb_clicked()
 
     Set& sets = getSetsInTree();
     for(auto &set: sets.getSetsAep()) {
-        swapFilesToComplectAep(set);
+        sortFilesToComplectAep(set);
         Timer::setDateTimeFile(set.first, *itDateTime++);
         for(auto &files: set.second) {
             Timer::setDateTimeFile(files, *itDateTime++);
