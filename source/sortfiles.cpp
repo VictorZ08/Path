@@ -21,9 +21,13 @@ void sortFilesToComplectAep(pairFiFiL& inFiles)
     Перетасовывает файлы
     @param inFiles ссылка на файлы
 */
-void shuffleExelFilesPemi(QFileInfoList& inFiles)
+void shuffleFiles(QFileInfoList& inFiles)
 {
     std::random_device rd;
     std::shuffle(inFiles.begin(), inFiles.end(), rd);
 }
-
+void shuffleFiles(QVector<pairFiFiL>& inFiles)
+{
+    std::random_device rd;
+    std::shuffle(inFiles.begin(), inFiles.end(), rd);
+}
