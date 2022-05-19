@@ -111,7 +111,7 @@ void TimerPemiWidget::m_start_pb_clicked()
     Set& sets = getSetsInTree();
     QVector<QDateTime>::iterator itDateTime = getDateTime().begin();
 
-    shuffleExelFilesPemi(sets.getSetsPemi());
+    shuffleFiles(sets.getSetsPemi());
     for(auto& set: sets.getSetsPemi()) {
         Timer::setDateTimeFile(set, *itDateTime++);
     }

@@ -336,7 +336,7 @@ void GeneratorPemiWidget::m_start_pb_clicked()
     /************************************/
     //Присваиваем двту и время
     QVector<QDateTime>::iterator itDateTime = getDateTime().begin();
-    shuffleExelFilesPemi(m_outExelFiles);
+    shuffleFiles(m_outExelFiles);
     for(auto& exelFile: m_outExelFiles) {
         Timer::setDateTimeFile(exelFile, *itDateTime++);
     }

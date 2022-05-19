@@ -7,6 +7,8 @@
     @author Victor Zaytcev
 */
 void sortFilesToComplectAep(pairFiFiL& inFiles);
-void shuffleExelFilesPemi(QFileInfoList& inFiles);
 
+void shuffleFiles(QFileInfoList& inFiles);
+
+void shuffleFiles(QVector<pairFiFiL>& inFiles);
 #endif // SORTFILES_H

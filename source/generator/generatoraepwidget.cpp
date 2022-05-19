@@ -170,6 +170,7 @@ void GeneratorAepWidget::m_start_pb_clicked()
     for(auto& pathFiles: m_outPathFiles)
         generatorsValuesAep(pathFiles);
 
+    shuffleFiles(sets.getSetsAep());
     QVector<QDateTime>::iterator itDateTime = getDateTime().begin();
     for(auto& pathFile: m_outPathFiles)
         Timer::setDateTimeFile(pathFile, *itDateTime++);
