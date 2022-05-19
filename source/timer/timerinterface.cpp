@@ -151,7 +151,7 @@ void TimerInterface::previewTime()
         if(m_numSets_le != nullptr)
             numSets = m_numSets_le->text().toInt();
         else
-            numSets = m_loadSetsTree.getSetsAep().count();
+            numSets = m_loadSetsTree.getSetsPemi().count();
 
         m_dateTime = Random::randTimePemi(m_beginWorkTime,
                                           numSets,

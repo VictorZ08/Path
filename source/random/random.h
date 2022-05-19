@@ -22,8 +22,7 @@ public:
                                            const quint64 inTimeBetweenSets);
 
 public:
-    static void insertTime(QVector<QDateTime>& inDateTime, const quint64 inCount);
-    static bool checkBreak(QDateTime& inDateTime);
+    static bool checkBreak(const QDateTime& inDateTime);
 };
 
 #endif // RANDOM_H

@@ -111,10 +111,10 @@ void TimerAepWidget::m_start_pb_clicked()
     QVector<QDateTime>::iterator itDateTime = getDateTime().begin();
 
     Set& sets = getSetsInTree();
-    for(auto &set: sets.getSetsAep()) {
+    for(auto& set: sets.getSetsAep()) {
         sortFilesToComplectAep(set);
         Timer::setDateTimeFile(set.first, *itDateTime++);
-        for(auto &files: set.second) {
+        for(auto& files: set.second) {
             Timer::setDateTimeFile(files, *itDateTime++);
         }
     }

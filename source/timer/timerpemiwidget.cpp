@@ -52,6 +52,9 @@ void TimerPemiWidget::connectSlots() const
 
     connect(ui->m_timeSet_le, SIGNAL(textChanged(const QString& )),
             this, SLOT(m_previewTime_le_changed()));
+
+    connect(this, SIGNAL(emitPreviewTime()),
+            this, SLOT(m_previewTime_le_changed()));
 }
 
 /**
