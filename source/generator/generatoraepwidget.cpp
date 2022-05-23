@@ -236,8 +236,8 @@ void GeneratorAepWidget::generatorsValuesAep(QFileInfo& inPathFiles)
 {
     if(inPathFiles.isFile()) {
         QString buffer = read(inPathFiles.absoluteFilePath());
-        genGetOneStr(buffer, m_mapStr);
-        buffer = genGetStr(buffer);
+        genGetOneStr(buffer);
+        buffer = generStrBuffer(std::move(buffer));
         write(inPathFiles.absoluteFilePath(), buffer);
     }
 }
@@ -282,58 +282,56 @@ void GeneratorAepWidget::write(const QString& inPathFileOut, QString& inContent)
 }
 
 /**
-    @brief GeneratorAepWidget::genGetStr
+    @brief GeneratorAepWidget::generStrBuffer
     Генерация значений из буфера
     @param inBuff строка значений
     @return возвращает сгенерированную строку
 */
-QString GeneratorAepWidget::genGetStr(QString& inBuff)
+QString GeneratorAepWidget::generStrBuffer(const QString&& inBuff)
 {
-    QString str;
-    QString::Iterator it = inBuff.begin();
+    double values;
+    QString strBuff;
+    QStringList  strList = inBuff.split("\n");
+    strBuff.resize(inBuff.count());
+    strBuff.clear();
 
-    while(*it != '\n' && *it != '\0') {
+    strBuff += strList.at(0) + '\n';
+    strList.pop_front();
+    strList.removeAll("");
 
-        quint64 tab = 0;
-        while (*it != '\t')
-               str += *it++;
-
-        str += *it++;
-        while(tab++ != 3) {
-            QString str_val;
-            while (*it != '\t' && *it != '\n')
-                    str_val += *it++;
-
-            double values = Random::randValues(str_val.toDouble(), m_valAmplituda);
-            str += QString::number(values, 'f', 2);
-            str += *it++;
+    for(auto&& str : strList) {
+        strBuff += str.left(str.indexOf('\t', 1)) + '\t';
+        for(int i = 1; i < 4; ++i) {
+            values = Random::randValues(str.section('\t', i, i).toDouble(),
+                                        m_valAmplituda);
+            strBuff += QString::number(values, 'f', 2) + '\t';
         }
+        strBuff.chop(1);
+        strBuff += '\n';
     }
-return str;
+return strBuff;
 }
 
 /**
     @brief GeneratorAepWidget::genGetOneStr
     Генерация значений первой строки файла
     @param inBuff строка значений
-    @param inMapset необходим для синхронизации значений
-    в файлах (режим вкл. и выкл.)
 */
-void GeneratorAepWidget::genGetOneStr(QString& inBuff, QMap<QString, QString>& inMapset)
+void GeneratorAepWidget::genGetOneStr(QString& inBuff)
 {
     QString str;
     while(inBuff.at(0) != '\n') {
         str += inBuff.at(0);
         inBuff.remove(0,1);
     }
-    QMap<QString, QString>::iterator it_map = inMapset.find(str);
-    if(!inMapset.contains(str)) {
-        inMapset.insert(str, QString::number(Random::randOneStringAep(str.toDouble())));
-        inBuff.prepend(inMapset.value(str));
+    QMap<QString, QString>::iterator it_map = m_mapStr.find(str);
+    if(!m_mapStr.contains(str)) {
+        m_mapStr.insert(str, QString::number(Random::randOneStringAep(str.toDouble())));
+        inBuff.prepend(m_mapStr.value(str));
     }
         else {
-            inBuff.prepend(inMapset.value(str));
-            inMapset.erase(it_map);
+            inBuff.prepend(m_mapStr.value(str));
+            m_mapStr.erase(it_map);
         }
 }
 

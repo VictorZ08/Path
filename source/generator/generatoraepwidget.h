@@ -32,9 +32,9 @@ protected:
     void generatorsValuesAep(QFileInfo& inPathFiles);
     QString read(const QString& inPathFile) const;
     void write(const QString& inPathFileOut, QString& inContent);
-    void genGetOneStr(QString& inBuff, QMap<QString, QString>& inMapset);
+    void genGetOneStr(QString& inBuff);
 
-    QString genGetStr(QString& inBuff);
+    QString generStrBuffer(const QString&& inBuff);
 
 protected slots:
     void m_clear_pb_clicked();
