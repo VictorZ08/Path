@@ -2,11 +2,13 @@
 #define SORTFILES_H
 
 #include "set.h"
+class Set;
+//class QFileInfoList;
 
 /**
     @author Victor Zaytcev
 */
-void sortFilesToComplectAep(pairFiFiL& inFiles);
+void sortFilesToComplectAep(Set& inFiles);
 
 void shuffleFiles(QFileInfoList& inFiles);
 

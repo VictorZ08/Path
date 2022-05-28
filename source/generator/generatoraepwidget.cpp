@@ -9,8 +9,8 @@
 #include <QDir>
 #include <QDebug>
 
-static quint64 nameSet;
-static quint64 positionFiles;
+static int nameSet;
+static int positionFiles;
 
 GeneratorAepWidget::GeneratorAepWidget(SystemTray* inSysTray,
                                        QWidget* inParent)
@@ -125,6 +125,8 @@ void GeneratorAepWidget::m_clear_pb_clicked()
 {
     clearWiget();
 
+    nameSet = 0;
+    positionFiles = 0;
     m_mapStr.clear();
     m_outPathFiles.clear();
     ui->m_saveSets_le->clear();
@@ -160,25 +162,18 @@ void GeneratorAepWidget::m_previewTime_le_changed()
 */
 void GeneratorAepWidget::m_start_pb_clicked()
 {
-    qDebug()<<"1";
     m_outPathFiles.clear();
+
     Set& setsInTree = getSetsInTree();
-    for(auto& set : setsInTree.getSetsAep())
-        sortFilesToComplectAep(set);
-qDebug()<<"2";
-    //QVector<pairFiFiL>::iterator itSets = setsInTree.getSetsAep().begin();
-    //quint64 numberSets = ui->m_numSets_le->text().toInt();
-    //for(quint64 numSet = 0; numSet < numberSets; ++numSet)
-        createSet(setsInTree);
-qDebug()<<"3";
+    sortFilesToComplectAep(setsInTree);
+    createSet(setsInTree);
     randValuesInFilesAep(m_outPathFiles);
-qDebug()<<"4";
     shuffleFiles(setsInTree.getSetsAep());
-    qDebug()<<"5";
-    QVector<QDateTime>::iterator itDateTime = getDateTime().begin();
-    for(auto& pathFile: m_outPathFiles)
-        Timer::setDateTimeFile(pathFile, *itDateTime++);
-qDebug()<<"6";
+
+    QVector<QDateTime>::iterator itDT = getDateTime().begin();
+    for(auto& pathFile : m_outPathFiles)
+        setDateTimeFiles(pathFile, *itDT++);
+
     statusGeneratesFiles("color: rgb(255, 255, 255)", "Статус: Готов");
 
 }
@@ -186,8 +181,7 @@ qDebug()<<"6";
 /**
     @brief GeneratorAepWidget::createSet
     Создает комплекты
-    @param it Итератор начала списка копируемых файлов
-    @param inSet Комплект (требуется для установки it)
+    @param inSetInTree Комплект из трейвиджета
 */
 void GeneratorAepWidget::createSet(Set& inSetInTree)
 {
@@ -211,8 +205,8 @@ void GeneratorAepWidget::createFolders()
     QDir dir;
     QString saveSets = ui->m_saveSets_le->text();
     m_outPathFiles.append(saveSets +
-                              QDir::separator() +
-                              QString::number(++nameSet));
+                          QDir::separator() +
+                          QString::number(++nameSet));
     dir.mkpath(m_outPathFiles.at(positionFiles++).absoluteFilePath());
 }
 
@@ -224,8 +218,8 @@ void GeneratorAepWidget::createFolders()
 void GeneratorAepWidget::copyFiles(const QFileInfoList& inPathFiles)
 {
     QString saveSets = ui->m_saveSets_le->text();
-    QFileInfoList::ConstIterator it;
-    for(it = inPathFiles.begin(); it != inPathFiles.end(); ++it) {
+    QFileInfoList::ConstIterator it = inPathFiles.begin();
+    for(; it != inPathFiles.end(); ++it) {
         m_outPathFiles.append(saveSets + QDir::separator() +
                                   QString::number(nameSet)+
                                   QDir::separator() +

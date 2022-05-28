@@ -55,19 +55,19 @@ GeneratorPemiWidget::~GeneratorPemiWidget()
 */
 void GeneratorPemiWidget::initDilog()
 {
-    QStringList listAntenne     = {"", "АИ 5-0 (2161) до 1 ГГц", "АИ 5-0 (2162) до 1 ГГц",
-                                    "АИ 5-0 (2165) до 1 ГГц", "НБА-02 (21002) до 1 ГГц",
-                                    "НБА-02 (21003) до 1 ГГц", "USLP 9143 #686 свыше 1 ГГц",
-                                    "USLP 9143 #543 свыше 1 ГГц", "ЛПА-2 свыше 1 ГГц",
-                                    "ВВНА 9120 D (01554) свыше 1 ГГц", "ВВНА 9120 D (01555) свыше 1 ГГц",
-                                    "EMCO 6511", "токосьемник ОСА-А", "токосьемник EZ-17"};
+    QStringList listAntenne = {"", "АИ 5-0 (2161) до 1 ГГц", "АИ 5-0 (2162) до 1 ГГц",
+                               "АИ 5-0 (2165) до 1 ГГц", "НБА-02 (21002) до 1 ГГц",
+                               "НБА-02 (21003) до 1 ГГц", "USLP 9143 #686 свыше 1 ГГц",
+                               "USLP 9143 #543 свыше 1 ГГц", "ЛПА-2 свыше 1 ГГц",
+                               "ВВНА 9120 D (01554) свыше 1 ГГц", "ВВНА 9120 D (01555) свыше 1 ГГц",
+                               "EMCO 6511", "токосьемник ОСА-А", "токосьемник EZ-17"};
 
-    QStringList listWorkers   = {"", "-", "Далевич", "Гришкин", "Зайцев", "Сидоров",
-                                        "Привалов", "Заренок", "Осипенко", "Родионов",
-                                        "Арутюнян"};
+    QStringList listWorkers = {"", "-", "Далевич", "Гришкин", "Зайцев", "Сидоров",
+                               "Привалов", "Заренок", "Осипенко", "Родионов",
+                               "Арутюнян"};
 
-    QStringList listWorkplace   = {"", "Лаборатория", "БЭК-1", "БЭК-2",
-                                        "ИП-2", "ИП-3", "АРТМ"};
+    QStringList listWorkplace = {"", "Лаборатория", "БЭК-1", "БЭК-2",
+                                 "ИП-2", "ИП-3", "АРТМ"};
 
     ui->m_boxInjener_cb->addItems(listWorkers);
     ui->m_boxTehnic_cb->addItems(listWorkers);
@@ -335,10 +335,10 @@ void GeneratorPemiWidget::m_start_pb_clicked()
     }
     /************************************/
     //Присваиваем двту и время
-    QVector<QDateTime>::iterator itDateTime = getDateTime().begin();
+    QVector<QDateTime>::iterator itDT = getDateTime().begin();
     shuffleFiles(m_outExelFiles);
     for(auto& exelFile: m_outExelFiles) {
-        Timer::setDateTimeFile(exelFile, *itDateTime++);
+        setDateTimeFiles(exelFile, *itDT++);
     }
     //Создаем файл и записываем в него s/n комплектов
     writeSNsetsInTxtFile(saveSets, "s-n", dataSets);
