@@ -109,11 +109,11 @@ void TimerPemiWidget::m_back_pb_clicked()
 void TimerPemiWidget::m_start_pb_clicked()
 {
     Set& sets = getSetsInTree();
-    QVector<QDateTime>::iterator itDateTime = getDateTime().begin();
 
+    QVector<QDateTime>::iterator itDT = getDateTime().begin();
     shuffleFiles(sets.getSetsPemi());
-    for(auto& set: sets.getSetsPemi()) {
-        Timer::setDateTimeFile(set, *itDateTime++);
+    for(auto& set : sets.getSetsPemi()) {
+        setDateTimeFiles(set, *itDT++);
     }
     statusGeneratesFiles("color: rgb(255, 255, 255)",
                          "Статус: Готов");

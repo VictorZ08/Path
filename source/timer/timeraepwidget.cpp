@@ -113,13 +113,14 @@ void TimerAepWidget::m_start_pb_clicked()
 
     Set& sets = getSetsInTree();
     shuffleFiles(sets.getSetsAep());
-    for(auto& set: sets.getSetsAep()) {
-        sortFilesToComplectAep(set);
-        Timer::setDateTimeFile(set.first, *itDateTime++);
-        for(auto& files: set.second) {
-            Timer::setDateTimeFile(files, *itDateTime++);
-        }
-    }
+    sortFilesToComplectAep(sets);
+    //for(auto& set: sets.getSetsAep()) {
+        //sortFilesToComplectAep(sets);
+        //Timer::setDateTimeFile(set.first, *itDateTime++);
+        //for(auto& files: set.second) {
+            //Timer::setDateTimeFile(files, *itDateTime++);
+        //}
+    //}
     statusGeneratesFiles("color: rgb(255, 255, 255)",
                          "Статус: Готов");
 }

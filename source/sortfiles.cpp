@@ -4,16 +4,15 @@
 /**
     @brief sortFilesToComplectAep
     Сортирует файлы в каталоге
-    @param inFiles ссылка на каталог с файлами
+    @param inSets ссылка на каталог с файлами
 */
-void sortFilesToComplectAep(pairFiFiL& inFiles)
+void sortFilesToComplectAep(Set& inSets)
 {
-    QFileInfoList::iterator itBeg = inFiles.second.begin();
-    QFileInfoList::iterator itEnd = inFiles.second.end();
-
-    std::sort(itBeg, itEnd, [](QFileInfo& a, QFileInfo& b) {
-        return a.baseName().contains("выкл",
-                                     Qt::CaseInsensitive); });
+    for(auto& set : inSets.getSetsAep()) {
+        std::sort(set.second.begin(), set.second.end(), [](QFileInfo& a, QFileInfo& b) {
+            return a.baseName().contains("выкл",
+                                         Qt::CaseInsensitive); });
+    }
 }
 
 /**

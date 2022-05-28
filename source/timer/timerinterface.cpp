@@ -22,7 +22,7 @@ TimerInterface::TimerInterface(SystemTray* inSysTray,
                                QWidget* inParent)
         : QDialog(inParent)
         , m_sysTray{inSysTray}
-        , m_beginWorkTime{Timer::getWorkDateTime()}
+        , m_beginWorkTime{getWorkDateTime()}
 {
     qDebug()<<"Create TimerInterface";
 }

@@ -4,14 +4,8 @@
 class QDateTime;
 class QFileInfo;
 
-class Timer
-{
-public:
-    static const QDateTime getWorkDateTime();
-    static void setDateTimeFile(const QFileInfo& inNameFile,
-                                const QDateTime& inDateTime);
-private:
-    Timer() {};
-};
+const QDateTime getWorkDateTime();
+void setDateTimeFiles(const QFileInfo& inFiles,
+                      const QDateTime& inDateTime);
 
 #endif // TIMER_H
