@@ -125,6 +125,8 @@ void GeneratorAepWidget::m_clear_pb_clicked()
 {
     clearWiget();
 
+    m_mapStr.clear();
+    m_outPathFiles.clear();
     ui->m_saveSets_le->clear();
     ui->m_numSets_le->clear();
     statusGeneratesFiles("color: rgb(0, 0, 0)",
@@ -158,40 +160,46 @@ void GeneratorAepWidget::m_previewTime_le_changed()
 */
 void GeneratorAepWidget::m_start_pb_clicked()
 {
-    Set& sets = getSetsInTree();
-    for(auto& set: sets.getSetsAep())
+    qDebug()<<"1";
+    m_outPathFiles.clear();
+    Set& setsInTree = getSetsInTree();
+    for(auto& set : setsInTree.getSetsAep())
         sortFilesToComplectAep(set);
-
-    QVector<pairFiFiL>::iterator itSets = sets.getSetsAep().begin();//Добавить итератор
-    quint64 numberSets = ui->m_numSets_le->text().toInt();
-    for(quint64 set = 0; set < numberSets; ++set)
-        createSet(itSets, sets);
-
-    for(auto& pathFiles: m_outPathFiles)
-        generatorsValuesAep(pathFiles);
-
-    shuffleFiles(sets.getSetsAep());
+qDebug()<<"2";
+    //QVector<pairFiFiL>::iterator itSets = setsInTree.getSetsAep().begin();
+    //quint64 numberSets = ui->m_numSets_le->text().toInt();
+    //for(quint64 numSet = 0; numSet < numberSets; ++numSet)
+        createSet(setsInTree);
+qDebug()<<"3";
+    randValuesInFilesAep(m_outPathFiles);
+qDebug()<<"4";
+    shuffleFiles(setsInTree.getSetsAep());
+    qDebug()<<"5";
     QVector<QDateTime>::iterator itDateTime = getDateTime().begin();
     for(auto& pathFile: m_outPathFiles)
         Timer::setDateTimeFile(pathFile, *itDateTime++);
-
+qDebug()<<"6";
     statusGeneratesFiles("color: rgb(255, 255, 255)", "Статус: Готов");
 
 }
 
 /**
     @brief GeneratorAepWidget::createSet
-    Создает файлы
+    Создает комплекты
     @param it Итератор начала списка копируемых файлов
     @param inSet Комплект (требуется для установки it)
 */
-void GeneratorAepWidget::createSet(QVector<pairFiFiL>::iterator it, Set& inSet)
+void GeneratorAepWidget::createSet(Set& inSetInTree)
 {
-    createFolders();
-    copyFiles(it->second);
-    ++it;
-    if(it == inSet.getSetsAep().end())
-        it = inSet.getSetsAep().begin();
+    QVector<pairFiFiL>::iterator itSets = inSetInTree.getSetsAep().begin();
+    int numberSets = ui->m_numSets_le->text().toInt();
+    for(int numSet = 0; numSet < numberSets; ++numSet) {
+        createFolders();
+        copyFiles(itSets->second);
+        ++itSets;
+        if(itSets == inSetInTree.getSetsAep().end())
+            itSets = inSetInTree.getSetsAep().begin();
+    }
 }
 
 /**
@@ -213,7 +221,7 @@ void GeneratorAepWidget::createFolders()
     Копирует файлы из трея
     @param inPathFiles лист для сохранения путей файлов
 */
-void GeneratorAepWidget::copyFiles(QFileInfoList& inPathFiles)
+void GeneratorAepWidget::copyFiles(const QFileInfoList& inPathFiles)
 {
     QString saveSets = ui->m_saveSets_le->text();
     QFileInfoList::ConstIterator it;
@@ -228,17 +236,18 @@ void GeneratorAepWidget::copyFiles(QFileInfoList& inPathFiles)
 }
 
 /**
-    @brief GeneratorAepWidget::generatorsValuesAep
+    @brief GeneratorAepWidget::randValuesInFilesAep
     Генерирует рандомные значения в файлах
     @param inPathFiles лист файлов
 */
-void GeneratorAepWidget::generatorsValuesAep(QFileInfo& inPathFiles)
+void GeneratorAepWidget::randValuesInFilesAep(const QFileInfoList& inPathFiles)
 {
-    if(inPathFiles.isFile()) {
-        QString buffer = read(inPathFiles.absoluteFilePath());
-        genGetOneStr(buffer, m_mapStr);
-        buffer = genGetStr(buffer);
-        write(inPathFiles.absoluteFilePath(), buffer);
+    for(auto& pathFile : inPathFiles) {
+        if(pathFile.isFile()) {
+            QString buffer = read(pathFile.absoluteFilePath());
+            buffer = generStrBuffer(buffer);
+            write(pathFile.absoluteFilePath(), buffer);
+        }
     }
 }
 
@@ -268,7 +277,7 @@ QString GeneratorAepWidget::read(const QString& inPathFile) const
     @param inPathFileOut записываемый файл
     @param inContent значения записываемые в файл
 */
-void GeneratorAepWidget::write(const QString& inPathFileOut, QString& inContent)
+void GeneratorAepWidget::write(const QString& inPathFileOut, const QString& inContent)
 {
     QFile file(inPathFileOut);
     if (file.open(QIODevice::WriteOnly |
@@ -282,59 +291,56 @@ void GeneratorAepWidget::write(const QString& inPathFileOut, QString& inContent)
 }
 
 /**
-    @brief GeneratorAepWidget::genGetStr
+    @brief GeneratorAepWidget::generStrBuffer
     Генерация значений из буфера
     @param inBuff строка значений
     @return возвращает сгенерированную строку
 */
-QString GeneratorAepWidget::genGetStr(QString& inBuff)
+QString GeneratorAepWidget::generStrBuffer(const QString& inBuff)
 {
-    QString str;
-    QString::Iterator it = inBuff.begin();
+    double randValues;
+    QString tempBuff;
+    QStringList strList = inBuff.split('\n');
+    tempBuff.resize(inBuff.count());
+    tempBuff.clear();
 
-    while(*it != '\n' && *it != '\0') {
+    tempBuff += generOneStrBuffer(inBuff) + '\n';
+    strList.pop_front();
+    strList.removeAll("");
 
-        quint64 tab = 0;
-        while (*it != '\t')
-               str += *it++;
-
-        str += *it++;
-        while(tab++ != 3) {
-            QString str_val;
-            while (*it != '\t' && *it != '\n')
-                    str_val += *it++;
-
-            double values = Random::randValues(str_val.toDouble(), m_valAmplituda);
-            str += QString::number(values, 'f', 2);
-            str += *it++;
+    for(auto& str : strList) {
+        tempBuff += str.left(str.indexOf('\t', 1)) + '\t';
+        for(int tab = 1; tab < 4; ++tab) {
+            randValues = Random::randValues(str.section('\t', tab, tab).toDouble(),
+                                            m_valAmplituda);
+            tempBuff += QString::number(randValues, 'f', 2) + '\t';
         }
+        tempBuff.chop(1);
+        tempBuff += '\n';
     }
-return str;
+return tempBuff;
 }
 
 /**
-    @brief GeneratorAepWidget::genGetOneStr
+    @brief GeneratorAepWidget::generOneStrBuffer
     Генерация значений первой строки файла
     @param inBuff строка значений
-    @param inMapset необходим для синхронизации значений
-    в файлах (режим вкл. и выкл.)
 */
-void GeneratorAepWidget::genGetOneStr(QString& inBuff, QMap<QString, QString>& inMapset)
+QString GeneratorAepWidget::generOneStrBuffer(QStringView inBuff)
 {
-    QString str;
-    while(inBuff.at(0) != '\n') {
-        str += inBuff.at(0);
-        inBuff.remove(0,1);
+    QString tempBuffOneStr = inBuff.left(inBuff.indexOf('\n', 1)).toString();
+
+    QMap<QString, QString>::iterator itMap = m_mapStr.find(tempBuffOneStr);
+    if(!m_mapStr.contains(tempBuffOneStr)) {
+        m_mapStr.insert(tempBuffOneStr,
+                        QString::number(Random::randOneStringAep(tempBuffOneStr.toDouble())));
+        return m_mapStr.value(tempBuffOneStr);
     }
-    QMap<QString, QString>::iterator it_map = inMapset.find(str);
-    if(!inMapset.contains(str)) {
-        inMapset.insert(str, QString::number(Random::randOneStringAep(str.toDouble())));
-        inBuff.prepend(inMapset.value(str));
+    else {
+        tempBuffOneStr = m_mapStr.value(tempBuffOneStr);
+        m_mapStr.erase(itMap);
+        return tempBuffOneStr;
     }
-        else {
-            inBuff.prepend(inMapset.value(str));
-            inMapset.erase(it_map);
-        }
 }
 
 /**
@@ -347,9 +353,9 @@ void GeneratorAepWidget::m_report_pb_clicked()
    m_reportAep->show();
    QFileInfoList inputSets;
    Set& sets = getSetsInTree();
-   for(auto &set: sets.getSetsAep()) {
+   for(auto& set : sets.getSetsAep()) {
         inputSets.append(set.first);
-        for(int i = 0; i < set.second.count(); ++i)
+        for(auto i = 0; i < set.second.count(); ++i)
             inputSets.append(set.second.at(i));
    }
    m_reportAep->openInfoOut(m_outPathFiles, inputSets);
