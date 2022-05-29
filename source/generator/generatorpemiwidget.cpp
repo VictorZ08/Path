@@ -10,8 +10,6 @@
 #include <QDir>
 #include "QDebug"
 
-//constexpr   quint64 kTimeSet = 50;
-
 GeneratorPemiWidget::GeneratorPemiWidget(SystemTray* inSysTray,
                                          QWidget* inParent)
                 : TimerInterface(inSysTray, inParent)
@@ -55,19 +53,19 @@ GeneratorPemiWidget::~GeneratorPemiWidget()
 */
 void GeneratorPemiWidget::initDilog()
 {
-    QStringList listAntenne     = {"", "АИ 5-0 (2161) до 1 ГГц", "АИ 5-0 (2162) до 1 ГГц",
-                                    "АИ 5-0 (2165) до 1 ГГц", "НБА-02 (21002) до 1 ГГц",
-                                    "НБА-02 (21003) до 1 ГГц", "USLP 9143 #686 свыше 1 ГГц",
-                                    "USLP 9143 #543 свыше 1 ГГц", "ЛПА-2 свыше 1 ГГц",
-                                    "ВВНА 9120 D (01554) свыше 1 ГГц", "ВВНА 9120 D (01555) свыше 1 ГГц",
-                                    "EMCO 6511", "токосьемник ОСА-А", "токосьемник EZ-17"};
+    QStringList listAntenne = {"", "АИ 5-0 (2161) до 1 ГГц", "АИ 5-0 (2162) до 1 ГГц",
+                               "АИ 5-0 (2165) до 1 ГГц", "НБА-02 (21002) до 1 ГГц",
+                               "НБА-02 (21003) до 1 ГГц", "USLP 9143 #686 свыше 1 ГГц",
+                               "USLP 9143 #543 свыше 1 ГГц", "ЛПА-2 свыше 1 ГГц",
+                               "ВВНА 9120 D (01554) свыше 1 ГГц", "ВВНА 9120 D (01555) свыше 1 ГГц",
+                               "EMCO 6511", "токосьемник ОСА-А", "токосьемник EZ-17"};
 
-    QStringList listWorkers   = {"", "-", "Далевич", "Гришкин", "Зайцев", "Сидоров",
-                                        "Привалов", "Заренок", "Осипенко", "Родионов",
-                                        "Арутюнян"};
+    QStringList listWorkers = {"", "-", "Далевич", "Гришкин", "Зайцев", "Сидоров",
+                               "Привалов", "Заренок", "Осипенко", "Родионов",
+                               "Арутюнян"};
 
-    QStringList listWorkplace   = {"", "Лаборатория", "БЭК-1", "БЭК-2",
-                                        "ИП-2", "ИП-3", "АРТМ"};
+    QStringList listWorkplace = {"", "Лаборатория", "БЭК-1", "БЭК-2",
+                                 "ИП-2", "ИП-3", "АРТМ"};
 
     ui->m_boxInjener_cb->addItems(listWorkers);
     ui->m_boxTehnic_cb->addItems(listWorkers);
@@ -179,10 +177,7 @@ void GeneratorPemiWidget::m_clear_pb_clicked()
     ui->m_loadSets_tw->clear();
     ui->m_saveSets_le->clear();
 
-    //m_vSets.clear();
     m_outExelFiles.clear();
-
-    //m_dateTime.clear();
     statusGeneratesFiles("color: rgb(0, 0, 0)",
                          "Статус:-");
 }
@@ -199,36 +194,32 @@ void GeneratorPemiWidget::m_previewTime_le_textChanged()
 
 /**
     @brief GeneratorPemiWidget::searchTitulInExel
-    Ищет титульную рамку в exel файле
-    @param
-    @return
+    Поиск титульной таблицы в exel файле
+    @param inCoord координаты поиска таблицы
+    @param nameCell поиск таблицы по названию ячейки
+    @param xlsxFile exel файл с таблицей
+    @return координаты найденной таблицы
 */
-QXlsx::Cell* GeneratorPemiWidget::searchTitulInExel(const int x1, //Левая верхняя   //!!!!!!!!!!!!!!!!!!!!!
-                                                    const int x2, //Правая верхняя
-                                                    const int y1, //Левая нижняя
-                                                    const int y2, //Правая нижняя
-                                           const QString& searchCell,
-                                           const QXlsx::Document& xlsxFile,
-                                                  QPoint& point)
+QPoint GeneratorPemiWidget::searchTitulInExel(const sCoordSerchTable& inCoord,
+                                              const QString& nameCell,
+                                              const QXlsx::Document& xlsxFile)
 {
     QXlsx::Cell* cell;
-    QString     val;
-    /*Поиск значения в ячейки*/
-    for(int row = y1; row < y2; row++) {
-        for(int col = x1; col < x2; col++) {
+    QString val;
+    for(int row = inCoord.rowStart; row < inCoord.rowEnd; ++row) {
+        for(int col = inCoord.columnStart; col < inCoord.columnEnd; ++col) {
             cell = xlsxFile.cellAt(row, col);
             if(cell == nullptr)
                continue;
             val.append(cell->value().toString());
-            if(val.contains(searchCell, Qt::CaseInsensitive)) {
-               point.setX(row);
-               point.setY(col);
-               return cell;
+            if(val.contains(nameCell, Qt::CaseInsensitive)) {
+               QPoint point(row, col);
+               return point;
             }
          }
      }
-
-return 0;
+QPoint point(0, 0);
+return point;
 }
 
 /**
@@ -297,8 +288,8 @@ void GeneratorPemiWidget::m_start_pb_clicked()
     QFileInfoList sets = getSetsInTree().getSetsPemi();
     QFileInfoList::iterator it = sets.begin();
     QString serialNumSet;
-    QVector<QStringList> dataSets = m_tableSetsWidget->tableValues();
-    foreach(auto dataSet, dataSets) {
+    QVector<QStringList> dataSets = m_tableSetsWidget->getTableValues();
+    for(auto& dataSet : dataSets) {
         if(dataSet.at(0) == "-")
             serialNumSet = dataSet.at(1);
         else
@@ -314,20 +305,21 @@ void GeneratorPemiWidget::m_start_pb_clicked()
     /*Редактируем файлы exel*/
     QPoint posCell;
     QStringList exelSeetsNames;
-    QVector<QStringList>::iterator itTableValues = m_tableSetsWidget->tableValues().begin();//можно взять вначале метода
+    QVector<QStringList>::iterator itTableValues = m_tableSetsWidget->getTableValues().begin();//можно взять вначале метода
 
-    for(auto& exelFile: m_outExelFiles) {
-        //Открываем exel файл
+    sCoordSerchTable coord;
+    for(auto& exelFile : m_outExelFiles) {
         QXlsx::Document xlsxOpenFile(exelFile.absoluteFilePath());
-        //Поиск титульной рамки в файле
-        QXlsx::Cell *cell = searchTitulInExel(5, 13, 5, 13, "Комплект", xlsxOpenFile, posCell);
-        if(cell == nullptr) {
+        posCell += searchTitulInExel(coord,
+                                     "Комплект",
+                                     xlsxOpenFile);
+        if(posCell.isNull()) {
             messageError();
             return;
         }
         editTitul(posCell, xlsxOpenFile, *itTableValues);
         exelSeetsNames = xlsxOpenFile.sheetNames();
-        for(auto& exelSeet: exelSeetsNames) {
+        for(auto& exelSeet : exelSeetsNames) {
             editSheet(xlsxOpenFile, exelSeet);
         }
         xlsxOpenFile.save();
@@ -335,10 +327,10 @@ void GeneratorPemiWidget::m_start_pb_clicked()
     }
     /************************************/
     //Присваиваем двту и время
-    QVector<QDateTime>::iterator itDateTime = getDateTime().begin();
-    shuffleExelFilesPemi(m_outExelFiles);
-    for(auto& exelFile: m_outExelFiles) {
-        Timer::setDateTimeFile(exelFile, *itDateTime++);
+    QVector<QDateTime>::iterator itDT = getDateTime().begin();
+    shuffleFiles(m_outExelFiles);
+    for(auto& exelFile : m_outExelFiles) {
+        setDateTimeFiles(exelFile, *itDT++);
     }
     //Создаем файл и записываем в него s/n комплектов
     writeSNsetsInTxtFile(saveSets, "s-n", dataSets);
@@ -384,24 +376,24 @@ void GeneratorPemiWidget::copyFiles(const QFileInfo& inExcelFile,
 /**
     @brief GeneratorPemiWidget::editTitul
     Редактирование титульной рамки
-    @param inPosition Координаты начала титульной рамки
+    @param inPositionTable Координаты начала титульной рамки
     @param inExcelFile Файл exel для редактирования
     @param inData Данные по каждому комплекту
 */
-void GeneratorPemiWidget::editTitul(const QPoint& inPosition,
+void GeneratorPemiWidget::editTitul(const QPoint& inPositionTable,
                                     QXlsx::Document& inExcelFile,
                                     const QStringList& inData)
 {
-    QPoint tempPosCell = inPosition;
-    quint64 row = m_prDataTitul.first.count();
+    QPoint posCell = inPositionTable;
+    int row = m_prDataTitul.first.count();
 
     for(int i = 0; i < 3; ++i) {
         m_prDataTitul.second.replace(i, inData.at(i));
     }
-    for(quint64 r = 0; r < row; ++r) {
-        inExcelFile.write(tempPosCell.rx(),tempPosCell.ry(), m_prDataTitul.first.at(r));
-        inExcelFile.write(tempPosCell.rx(),tempPosCell.ry()+1, m_prDataTitul.second.at(r));
-        ++tempPosCell.rx();
+    for(int r = 0; r < row; ++r) {
+        inExcelFile.write(posCell.rx(), posCell.ry(), m_prDataTitul.first.at(r));
+        inExcelFile.write(posCell.rx(), posCell.ry()+1, m_prDataTitul.second.at(r));
+        ++posCell.rx();
     }
 }
 
@@ -471,7 +463,7 @@ void GeneratorPemiWidget::writeSNsetsInTxtFile(const QString& outPath,
                   QIODevice::Truncate)){
 
         QTextStream out(&file);
-        foreach(auto numerSet, dataSets)
+        for(auto& numerSet : dataSets)
             out << numerSet.at(twoColumn) << "\n";
     }
     file. close();
@@ -509,7 +501,7 @@ void GeneratorPemiWidget::m_back_pb_clicked()
 void GeneratorPemiWidget::showForm()
 {
     this->show();
-    quint64 row = m_tableSetsWidget->getRow();
+    int row = m_tableSetsWidget->getRow();
     ui->m_numSets_le->setText(QString::number(row));
     m_previewTime_le_textChanged();
 }

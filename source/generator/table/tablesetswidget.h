@@ -21,9 +21,11 @@ public:
                              QWidget*    inParent  = nullptr);
     ~TableSetsWidget();
 
-    quint64 getColumn() { return m_column; } //????
-    quint64 getRow() { return m_row; } //????
-    QVector<QStringList>& tableValues();
+    //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    int getColumn() const { return m_column; } //????
+    int getRow() const { return m_row; } //????!
+
+    QVector<QStringList>& getTableValues();
 
 protected:
     void connectSlots() const;
@@ -52,9 +54,9 @@ private:
     SystemTray* m_sysTray = nullptr;
     QVector<QStringList> m_tableValues;
 
-    qint64 m_row = 0;
-    qint64 m_column = 0;
-    qint64 m_combination_rb;
+    int m_row = 0;
+    int m_column = 0;
+    int m_combination_rb = -1;
 };
 
 #endif // TABLESETSWIDGET_H

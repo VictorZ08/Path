@@ -12,7 +12,7 @@ void TableData::setDataTable()
     //return m_sData;
 }
 
-QVector<sData> &TableData::dataTable()
+QVector<sData> TableData::dataTable() const
 {
     return m_sData;
 }

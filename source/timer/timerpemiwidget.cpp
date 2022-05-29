@@ -52,6 +52,9 @@ void TimerPemiWidget::connectSlots() const
 
     connect(ui->m_timeSet_le, SIGNAL(textChanged(const QString& )),
             this, SLOT(m_previewTime_le_changed()));
+
+    connect(this, SIGNAL(emitPreviewTime()),
+            this, SLOT(m_previewTime_le_changed()));
 }
 
 /**
@@ -106,11 +109,11 @@ void TimerPemiWidget::m_back_pb_clicked()
 void TimerPemiWidget::m_start_pb_clicked()
 {
     Set& sets = getSetsInTree();
-    QVector<QDateTime>::iterator itDateTime = getDateTime().begin();
 
-    shuffleExelFilesPemi(sets.getSetsPemi());
-    for(auto& set: sets.getSetsPemi()) {
-        Timer::setDateTimeFile(set, *itDateTime++);
+    QVector<QDateTime>::iterator itDT = getDateTime().begin();
+    shuffleFiles(sets.getSetsPemi());
+    for(auto& set : sets.getSetsPemi()) {
+        setDateTimeFiles(set, *itDT++);
     }
     statusGeneratesFiles("color: rgb(255, 255, 255)",
                          "Статус: Готов");

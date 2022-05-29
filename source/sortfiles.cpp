@@ -2,18 +2,16 @@
 #include <random>
 
 /**
-    @brief swapFilesToComplectAep
-    Меняет местами файлы в каталоге
-    @param inFiles ссылка на каталог с файлами
+    @brief sortFilesToComplectAep
+    Сортирует файлы в каталоге
+    @param inSets ссылка на каталог с файлами
 */
-void swapFilesToComplectAep(pairFiFiL& inFiles)
+void sortFilesToComplectAep(Set& inSets)
 {
-    int count = inFiles.second.count();
-    int backRow = 0;
-    for(int frontRow = 0; frontRow < count; frontRow++) {
-        if(strstr(inFiles.second.at(frontRow).baseName().toUtf8(), "выкл")) {
-            inFiles.second.swapItemsAt(frontRow, backRow++);
-        }
+    for(auto& set : inSets.getSetsAep()) {
+        std::sort(set.second.begin(), set.second.end(), [](QFileInfo& a, QFileInfo& b) {
+            return a.baseName().contains("выкл",
+                                         Qt::CaseInsensitive); });
     }
 }
 
@@ -22,9 +20,13 @@ void swapFilesToComplectAep(pairFiFiL& inFiles)
     Перетасовывает файлы
     @param inFiles ссылка на файлы
 */
-void shuffleExelFilesPemi(QFileInfoList& inFiles)
+void shuffleFiles(QFileInfoList& inFiles)
 {
     std::random_device rd;
     std::shuffle(inFiles.begin(), inFiles.end(), rd);
 }
-
+void shuffleFiles(QVector<pairFiFiL>& inFiles)
+{
+    std::random_device rd;
+    std::shuffle(inFiles.begin(), inFiles.end(), rd);
+}

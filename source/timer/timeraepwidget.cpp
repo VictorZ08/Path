@@ -106,18 +106,21 @@ void TimerAepWidget::m_previewTime_le_changed()
     @brief TimerAepWidget::m_start_pb_clicked
     Запуск перетасовки файлов и присвоения им время
 */
+#include <random>
 void TimerAepWidget::m_start_pb_clicked()
 {
     QVector<QDateTime>::iterator itDateTime = getDateTime().begin();
 
     Set& sets = getSetsInTree();
-    for(auto &set: sets.getSetsAep()) {
-        swapFilesToComplectAep(set);
-        Timer::setDateTimeFile(set.first, *itDateTime++);
-        for(auto &files: set.second) {
-            Timer::setDateTimeFile(files, *itDateTime++);
-        }
-    }
+    shuffleFiles(sets.getSetsAep());
+    sortFilesToComplectAep(sets);
+    //for(auto& set: sets.getSetsAep()) {
+        //sortFilesToComplectAep(sets);
+        //Timer::setDateTimeFile(set.first, *itDateTime++);
+        //for(auto& files: set.second) {
+            //Timer::setDateTimeFile(files, *itDateTime++);
+        //}
+    //}
     statusGeneratesFiles("color: rgb(255, 255, 255)",
                          "Статус: Готов");
 }
