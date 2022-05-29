@@ -6,7 +6,7 @@
 
 class TableSetsWidget;
 
-struct CoordSerchTable {
+struct sCoordSerchTable {
     int rowStart = 5;
     int rowEnd = 13;
     int columnStart = rowStart;
@@ -49,7 +49,7 @@ protected:
                               const QString& nameFile,
                               const QVector<QStringList>& dataSets);
     void messageError(); //!!!!!!!!!!!!!!!!
-    QPoint searchTitulInExel(const CoordSerchTable& inCoord,
+    QPoint searchTitulInExel(const sCoordSerchTable& inCoord,
                              const QString& nameCell,
                              const QXlsx::Document& xlsxFile);
 

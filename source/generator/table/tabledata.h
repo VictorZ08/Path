@@ -5,17 +5,18 @@
 #include "QVector"
 
 struct sData {
-    QString oneColumn {"-"};
-    QString twoColumn {"-"};
-    QString threColumn{"-"};
+    QString numSet {"-"};
+    QString serialNumber {"-"};
+    QString znp {"-"};
 };
 
 class TableData
 {
 public:
     TableData();
+
     void setDataTable();
-    QVector<sData> &dataTable();
+    QVector<sData> dataTable() const;
 
 private:
     QVector<sData> m_sData;
