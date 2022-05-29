@@ -6,6 +6,14 @@
 
 class TableSetsWidget;
 
+struct CoordSerchTable {
+    int rowStart = 5;
+    int rowEnd = 13;
+    int columnStart = rowStart;
+    int columnEnd = 13;
+
+};
+
 QT_BEGIN_NAMESPACE
 namespace Ui {class GeneratorPemiWidget; }
 QT_END_NAMESPACE
@@ -27,11 +35,11 @@ protected:
     void initEventFiter();
     void initSpinBoxAmplituda();
     void writeSerialsNumbersTxt(void);
-    void editTitul(const QPoint& inPosition, //!!!!!!!!!!!!!
-                      QXlsx::Document& inExcelFile,
-                      const QStringList& inData);
+    void editTitul(const QPoint& inPositionTable, //!!!!!!!!!!!!!
+                   QXlsx::Document& inExcelFile,
+                   const QStringList& inData);
     void editSheet(QXlsx::Document& inExcelFile,
-                      QString& inExcelSeetNames);
+                   QString& inExcelSeetNames);
     void copyFiles(const QFileInfo& inFile,
                    const QString& outFile,
                    const QString& nameFile);
@@ -41,14 +49,9 @@ protected:
                               const QString& nameFile,
                               const QVector<QStringList>& dataSets);
     void messageError(); //!!!!!!!!!!!!!!!!
-
-    QXlsx::Cell* searchTitulInExel(const int x1, //Р›РµРІР°СЏ РІРµСЂС…РЅСЏСЏ   //!!!!!!!!!!!!!!!!!!!!!
-                                   const int x2, //РџСЂР°РІР°СЏ РІРµСЂС…РЅСЏСЏ
-                                   const int y1, //Р›РµРІР°СЏ РЅРёР¶РЅСЏСЏ
-                                   const int y2, //РџСЂР°РІР°СЏ РЅРёР¶РЅСЏСЏ
-                                   const QString& searchCell,
-                                   const QXlsx::Document& xlsxFile,
-                                         QPoint& point);
+    QPoint searchTitulInExel(const CoordSerchTable& inCoord,
+                             const QString& nameCell,
+                             const QXlsx::Document& xlsxFile);
 
 protected slots:
     void m_clear_pb_clicked();
