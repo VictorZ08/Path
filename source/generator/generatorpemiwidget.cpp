@@ -200,7 +200,7 @@ void GeneratorPemiWidget::m_previewTime_le_textChanged()
     @param xlsxFile exel файл с таблицей
     @return координаты найденной таблицы
 */
-QPoint GeneratorPemiWidget::searchTitulInExel(const CoordSerchTable& inCoord,
+QPoint GeneratorPemiWidget::searchTitulInExel(const sCoordSerchTable& inCoord,
                                               const QString& nameCell,
                                               const QXlsx::Document& xlsxFile)
 {
@@ -288,7 +288,7 @@ void GeneratorPemiWidget::m_start_pb_clicked()
     QFileInfoList sets = getSetsInTree().getSetsPemi();
     QFileInfoList::iterator it = sets.begin();
     QString serialNumSet;
-    QVector<QStringList> dataSets = m_tableSetsWidget->tableValues();
+    QVector<QStringList> dataSets = m_tableSetsWidget->getTableValues();
     for(auto& dataSet : dataSets) {
         if(dataSet.at(0) == "-")
             serialNumSet = dataSet.at(1);
@@ -305,9 +305,9 @@ void GeneratorPemiWidget::m_start_pb_clicked()
     /*Редактируем файлы exel*/
     QPoint posCell;
     QStringList exelSeetsNames;
-    QVector<QStringList>::iterator itTableValues = m_tableSetsWidget->tableValues().begin();//можно взять вначале метода
+    QVector<QStringList>::iterator itTableValues = m_tableSetsWidget->getTableValues().begin();//можно взять вначале метода
 
-    CoordSerchTable coord;
+    sCoordSerchTable coord;
     for(auto& exelFile : m_outExelFiles) {
         QXlsx::Document xlsxOpenFile(exelFile.absoluteFilePath());
         posCell += searchTitulInExel(coord,
@@ -501,7 +501,7 @@ void GeneratorPemiWidget::m_back_pb_clicked()
 void GeneratorPemiWidget::showForm()
 {
     this->show();
-    quint64 row = m_tableSetsWidget->getRow();
+    int row = m_tableSetsWidget->getRow();
     ui->m_numSets_le->setText(QString::number(row));
     m_previewTime_le_textChanged();
 }

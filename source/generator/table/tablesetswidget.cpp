@@ -1,6 +1,7 @@
 #include "ui_tablesetswidget.h"
 #include "tablesetswidget.h"
 #include "modes/systemtray.h"
+#include "tabledata.h"//!!!!!!!!!!!!!!!!
 
 #include <QMessageBox>
 #include <QKeyEvent>
@@ -84,7 +85,7 @@ void TableSetsWidget::initEventFiter()
     Данные таблицы
     @return возвращает данные таблицы
 */
-QVector<QStringList>& TableSetsWidget::tableValues()
+QVector<QStringList>& TableSetsWidget::getTableValues()
 {
     return m_tableValues;
 }
@@ -156,7 +157,9 @@ void TableSetsWidget::setCombination(const int inCombination_rb)
 */
 void TableSetsWidget::createTable()
 {
-    m_column = kCombination[m_combination_rb].count();
+    if(m_combination_rb != -1 )
+        m_column = kCombination[m_combination_rb].count();
+
     ui->m_tableSet_tw->setRowCount(m_row);
     ui->m_tableSet_tw->setColumnCount(m_column);
     ui->m_tableSet_tw->setHorizontalHeaderLabels(kCombination[m_combination_rb]);
@@ -184,8 +187,8 @@ return false;
 */
 void TableSetsWidget::moveCursorCell()
 {
-    qint64 col = ui->m_tableSet_tw->currentColumn();
-    qint64 row = ui->m_tableSet_tw->currentRow();
+    int col = ui->m_tableSet_tw->currentColumn();
+    int row = ui->m_tableSet_tw->currentRow();
     if(col < m_column-1) {
         QModelIndex newIndex = ui->m_tableSet_tw->model()->index(row, ++col);
         ui->m_tableSet_tw->setCurrentIndex(newIndex);
@@ -222,17 +225,20 @@ bool TableSetsWidget::saveTableData()
     m_tableValues.clear();
     m_tableValues.reserve(m_row);
 
+    QModelIndex newIndex = ui->m_tableSet_tw->model()->index(0, 0);
+    ui->m_tableSet_tw->setCurrentIndex(newIndex);
+
     QTableWidgetItem *p_twi = nullptr;
     p_twi = ui->m_tableSet_tw->horizontalHeaderItem(0);
     if(p_twi == nullptr) {
         return true;
     }
     QString str = p_twi->text();
-    for(int r = 0; r < m_row; ++r ) {
+    for(int row = 0; row < m_row; ++row ) {
         QStringList sl;
            if(str == "Комплект") {
              for(int col = 0; col < m_column; ++col ) {
-                 p_twi = ui->m_tableSet_tw->item(r, col);
+                 p_twi = ui->m_tableSet_tw->item(row, col);
                  if(p_twi == nullptr) {
                     return true;
                  }
@@ -242,7 +248,7 @@ bool TableSetsWidget::saveTableData()
             else if(str == "s/n") {
               sl.append("-");
               for(int col = 0; col < m_column; ++col ) {
-                  p_twi = ui->m_tableSet_tw->item(r, col);
+                  p_twi = ui->m_tableSet_tw->item(row, col);
                   if(p_twi == nullptr) {
                      return true;
                   }
@@ -251,8 +257,7 @@ bool TableSetsWidget::saveTableData()
             }
         m_tableValues.append(sl);
     }
-    m_tableValues.shrink_to_fit();
+
+m_tableValues.shrink_to_fit();
 return false;
 }
-
-
