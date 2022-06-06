@@ -174,6 +174,8 @@ void GeneratorPemiWidget::initSpinBoxAmplituda()
 */
 void GeneratorPemiWidget::m_clear_pb_clicked()
 {
+    clearWiget();
+
     ui->m_loadSets_tw->clear();
     ui->m_saveSets_le->clear();
 
@@ -310,9 +312,9 @@ void GeneratorPemiWidget::m_start_pb_clicked()
     sCoordSerchTable coord;
     for(auto& exelFile : m_outExelFiles) {
         QXlsx::Document xlsxOpenFile(exelFile.absoluteFilePath());
-        posCell += searchTitulInExel(coord,
-                                     "Комплект",
-                                     xlsxOpenFile);
+        posCell = searchTitulInExel(coord,
+                                    "Комплект",
+                                    xlsxOpenFile);
         if(posCell.isNull()) {
             messageError();
             return;
@@ -414,7 +416,7 @@ void GeneratorPemiWidget::editSheet(QXlsx::Document& inExcelFile,
     inExcelFile.selectSheet(inExcelSeetNames);
     if(!inExcelFile.read(row,kOneCol).isValid()) {
        inExcelFile.write(row, kOneCol, "с метра не обнаружено");
-       return;;
+       return;
     }
     while(inExcelFile.read(row,kOneCol).isValid()) {
         uint col = 2;
