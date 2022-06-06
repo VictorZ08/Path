@@ -297,7 +297,7 @@ QString GeneratorAepWidget::generStrBuffer(const QString& inBuff)
     QStringList strList = inBuff.split('\n');
     tempBuff.resize(inBuff.count());
     tempBuff.clear();
-
+qDebug()<< inBuff;
     tempBuff += generOneStrBuffer(inBuff) + '\n';
     strList.pop_front();
     strList.removeAll("");
