@@ -5,40 +5,27 @@
 #include <QFileInfoList>
 #include <QDebug>
 
-class DataVerificationAep : public QObject
+class DataVerificationAep
 {
      Q_OBJECT
 public:
-    explicit DataVerificationAep(QObject *parent = nullptr);
-    ~DataVerificationAep();
+    void checkFiles(const QFileInfoList& inFiles);
+    DataVerificationAep() = delete;
 
-    bool isDigitals(QStringView inStr);
-    bool isModes(const QString& inNameFiles);
-    bool isEvenFiles(const QFileInfoList& inFiles);
-    bool isEmptyOneStr();
-    bool compareResistance();
-
-
-
-    void checkingFileTxtAep(const QString &inNameFile);
-    //void checkingFileExelPemi(const QFile &inNameFile);
-
-signals:
-
+protected:
+    bool isDigitals(QStringView inStr) const;
+    bool isModes(const QString& inNameFiles) const;
+    bool isEvenFiles(const QFileInfoList& inFiles) const;
+    bool isEmptyFile(QStringView inStr) const;
+    bool compareResistance(const QStringList& inStr) const;
 
 private:
-    bool openFile(const QString &inNameFile);
-    void readFile(const QString &inNameFile);
-    /*void checkSymbols(const QString &inNameFile);
-    void checkDoubleSymbols(const QString &inNameFile);
-    void checkSymbolsBeforePoint(const QString &inNameFile);
-    void checkSymbolsAfterPoint(const QString &inNameFile);
-    void checkEndLine(const QString &inNameFile);
-    void checkParityFiles(const QString &inNameFile);*/
+    //void loadFile(const QString &fileName);////
+    //bool openFile(const QString &inNameFile);
+    bool readFile(const QString& inPathFile) const;
 
 private:
-
-
+    mutable QString m_buffer;
 };
 
 #endif // DATAVERIFICATION

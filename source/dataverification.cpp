@@ -1,58 +1,64 @@
 #include "dataverification.h"
 
-DataVerificationAep::DataVerificationAep(QObject *parent) : QObject(parent)
+void DataVerificationAep::checkFiles(const QFileInfoList& inFiles)
 {
-    qDebug()<<"Create DataVerification";
-}
+    for(auto& file : inFiles) {
+        if(readFile(file.absoluteFilePath())) {
+            //запись в лог open error nameFile
+            continue;
+        }
 
-//-------------------------------------
-DataVerificationAep::~DataVerificationAep()
-{
-   qDebug()<<"Kill DataVerification";
-}
+        /*if() {
 
-//-------------------------------------
-void DataVerificationAep::checkingFileTxtAep(const QString &inNameFile)
-{//Выполнить через исключение
-    if(!openFile(inNameFile)) {
-        qDebug() << "Message fun ERROR open";
-        return;
+        }
+
+        if() {
+
+        }
+
+        if() {
+
+        }
+
+        if() {
+
+        }
+
+        if() {
+
+        }
+
+        if() {
+
+        }*/
+
     }
-    //readFile(inNameFile);
-
 }
 
 //-------------------------------------
-bool DataVerificationAep::openFile(const QString &inNameFile)
+bool DataVerificationAep::readFile(const QString& inPathFile) const
 {
-    QFile file(inNameFile);
+    QFile file(inPathFile);
     if (file.open(QIODevice::ReadOnly | QIODevice::Text)){
-        qWarning("Cannot open file for reading");
-        return 1;
+        return true;
     }
-    QStringList line;
+
     QTextStream in(&file);
     while (!in.atEnd())
-        line.append(in.readLine());
+        m_buffer = in.readAll();
 
     file. close();
-return 0;
+return false;
 }
 
-//-------------------------------------
-void DataVerificationAep::readFile(const QString &inNameFile)
-{
-
-}
-
-bool DataVerificationAep::isDigitals(QStringView inStr)
+bool DataVerificationAep::isDigitals(QStringView inStr) const
 {
     QString::const_iterator it = std::find(inStr.begin(), inStr.end(),
                                            std::not1(std::ptr_fun(::isdigit)));
     return it == inStr.end();
 }
 
-bool DataVerificationAep::isModes(const QString& inNameFiles)
+bool DataVerificationAep::isModes(const QString& inNameFiles) const
 {
     if(inNameFiles.contains("выкл", Qt::CaseInsensitive) ||
        inNameFiles.contains("вкл", Qt::CaseInsensitive))
@@ -62,17 +68,30 @@ bool DataVerificationAep::isModes(const QString& inNameFiles)
 return false;
 }
 
-bool DataVerificationAep::isEvenFiles(const QFileInfoList& inFiles)
+bool DataVerificationAep::isEvenFiles(const QFileInfoList& inFiles) const
 {
     return inFiles.count() % 2 == 0;
 }
 
-bool DataVerificationAep::isEmptyOneStr(QStringView inStr)
+bool DataVerificationAep::isEmptyFile(QStringView inStr) const
 {
-
+    QString str(inStr.left(inStr.indexOf('\n', 1)).toString());
+    return str.isEmpty();
 }
 
-bool DataVerificationAep::compareResistance(QStringView inStr)
+bool DataVerificationAep::compareResistance(const QStringList& inStr) const
 {
+    /*QString tempBuffOneStr = inBuff.left(inBuff.indexOf('\n', 1)).toString();
 
+    QMap<QString, QString>::iterator itMap = m_mapStr.find(tempBuffOneStr);
+    if(!m_mapStr.contains(tempBuffOneStr)) {
+        m_mapStr.insert(tempBuffOneStr,
+                        QString::number(Random::randOneStringAep(tempBuffOneStr.toDouble())));
+        return m_mapStr.value(tempBuffOneStr);
+    }
+    else {
+        tempBuffOneStr = m_mapStr.value(tempBuffOneStr);
+        m_mapStr.erase(itMap);
+        return tempBuffOneStr;
+    }*/
 }
