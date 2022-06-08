@@ -2,15 +2,24 @@
 #define DATAVERIFICATION
 
 #include <QObject>
-#include <QFile>
+#include <QFileInfoList>
 #include <QDebug>
 
-class DataVerification : public QObject
+class DataVerificationAep : public QObject
 {
      Q_OBJECT
 public:
-    explicit DataVerification(QObject *parent = nullptr);
-    ~DataVerification();
+    explicit DataVerificationAep(QObject *parent = nullptr);
+    ~DataVerificationAep();
+
+    bool isDigitals(QStringView inStr);
+    bool isModes(const QString& inNameFiles);
+    bool isEvenFiles(const QFileInfoList& inFiles);
+    bool isEmptyOneStr();
+    bool compareResistance();
+
+
+
     void checkingFileTxtAep(const QString &inNameFile);
     //void checkingFileExelPemi(const QFile &inNameFile);
 
@@ -40,9 +49,9 @@ private:
  *2.Проверка на 00.00(2 символа после точки)
  *3.Проверка на .00 и 00. (символы до точки и после)
  *4.Проверка на конец строки после последнего значения
- *5.Проверка на четность файлов
- *6.Проверка названия файлов на присутствие реимов ("выкл" и "вкл")
- *7.Проверка одинаковых сопротивлений в 2х реж.
+ *5.Проверка на четность файлов//
+ *6.Проверка названия файлов на присутствие реимов ("выкл" и "вкл")//
+ *7.Проверка одинаковых сопротивлений в 2х реж.//
  *
  *ПЭМИ:
  *

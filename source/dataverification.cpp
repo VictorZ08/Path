@@ -1,18 +1,18 @@
 #include "dataverification.h"
 
-DataVerification::DataVerification(QObject *parent) : QObject(parent)
+DataVerificationAep::DataVerificationAep(QObject *parent) : QObject(parent)
 {
     qDebug()<<"Create DataVerification";
 }
 
 //-------------------------------------
-DataVerification::~DataVerification()
+DataVerificationAep::~DataVerificationAep()
 {
    qDebug()<<"Kill DataVerification";
 }
 
 //-------------------------------------
-void DataVerification::checkingFileTxtAep(const QString &inNameFile)
+void DataVerificationAep::checkingFileTxtAep(const QString &inNameFile)
 {//Выполнить через исключение
     if(!openFile(inNameFile)) {
         qDebug() << "Message fun ERROR open";
@@ -23,7 +23,7 @@ void DataVerification::checkingFileTxtAep(const QString &inNameFile)
 }
 
 //-------------------------------------
-bool DataVerification::openFile(const QString &inNameFile)
+bool DataVerificationAep::openFile(const QString &inNameFile)
 {
     QFile file(inNameFile);
     if (file.open(QIODevice::ReadOnly | QIODevice::Text)){
@@ -40,7 +40,39 @@ return 0;
 }
 
 //-------------------------------------
-void DataVerification::readFile(const QString &inNameFile)
+void DataVerificationAep::readFile(const QString &inNameFile)
+{
+
+}
+
+bool DataVerificationAep::isDigitals(QStringView inStr)
+{
+    QString::const_iterator it = std::find(inStr.begin(), inStr.end(),
+                                           std::not1(std::ptr_fun(::isdigit)));
+    return it == inStr.end();
+}
+
+bool DataVerificationAep::isModes(const QString& inNameFiles)
+{
+    if(inNameFiles.contains("выкл", Qt::CaseInsensitive) ||
+       inNameFiles.contains("вкл", Qt::CaseInsensitive))
+    {
+        return true;
+    }
+return false;
+}
+
+bool DataVerificationAep::isEvenFiles(const QFileInfoList& inFiles)
+{
+    return inFiles.count() % 2 == 0;
+}
+
+bool DataVerificationAep::isEmptyOneStr(QStringView inStr)
+{
+
+}
+
+bool DataVerificationAep::compareResistance(QStringView inStr)
 {
 
 }
