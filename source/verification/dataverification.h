@@ -6,17 +6,16 @@
 #include <QDebug>
 
 class DataVerificationAep
-{
-     Q_OBJECT
+{   
 public:
     void checkFiles(const QFileInfoList& inFiles);
-    DataVerificationAep() = delete;
-
+    //DataVerificationAep() = delete;
+ bool isCountLineFile(const QString& inNameFile) const;
 protected:
     bool isDigitals(QStringView inStr) const;
     bool isModes(const QString& inNameFiles) const;
     bool isEvenFiles(const QFileInfoList& inFiles) const;
-    bool isEmptyFile(QStringView inStr) const;
+    //bool isCountLineFile(const QString& inNameFile) const;
     bool compareResistance(const QStringList& inStr) const;
 
 private:

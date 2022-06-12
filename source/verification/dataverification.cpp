@@ -1,10 +1,21 @@
 #include "dataverification.h"
 
+#include <fstream>
+#include <QDebug>
+
+constexpr int limitCountLineFile = 15;
+//const QString kLogLevelDebug = "Не цифровой символ";
+//const QString kLogLevelDebug = "Не цифровой символ";
+
 void DataVerificationAep::checkFiles(const QFileInfoList& inFiles)
 {
+    QPair<QStringList, QStringList> checkError;
+
     for(auto& file : inFiles) {
+
         if(readFile(file.absoluteFilePath())) {
-            //запись в лог open error nameFile
+            checkError.first.append("Файл не открывается!");
+            checkError.second.append(file.absoluteFilePath());
             continue;
         }
 
@@ -53,9 +64,9 @@ return false;
 
 bool DataVerificationAep::isDigitals(QStringView inStr) const
 {
-    QString::const_iterator it = std::find(inStr.begin(), inStr.end(),
+    /*QString::const_iterator it = std::find(inStr.begin(), inStr.end(),
                                            std::not1(std::ptr_fun(::isdigit)));
-    return it == inStr.end();
+    return it == inStr.end();*/
 }
 
 bool DataVerificationAep::isModes(const QString& inNameFiles) const
@@ -73,10 +84,20 @@ bool DataVerificationAep::isEvenFiles(const QFileInfoList& inFiles) const
     return inFiles.count() % 2 == 0;
 }
 
-bool DataVerificationAep::isEmptyFile(QStringView inStr) const
+bool DataVerificationAep::isCountLineFile(const QString& inNameFile) const
 {
-    QString str(inStr.left(inStr.indexOf('\n', 1)).toString());
-    return str.isEmpty();
+    std::ifstream  in("C:/1.txt");
+    if(!in.is_open()){
+       qDebug()<<"no open";
+    }
+    size_t line = std::count(std::istreambuf_iterator<char>(in),
+                 std::istreambuf_iterator<char>(), '\n');
+
+    qDebug()<<"line: " << line;
+    if(line < limitCountLineFile)
+        return false;
+
+return true;
 }
 
 bool DataVerificationAep::compareResistance(const QStringList& inStr) const

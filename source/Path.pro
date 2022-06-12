@@ -15,7 +15,6 @@ CONFIG += c++11
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
-    dataverification.cpp \
     generator/generatoraepwidget.cpp \
     generator/generatorpemiwidget.cpp \
     generator/report/reportaepwidget.cpp \
@@ -36,12 +35,12 @@ SOURCES += \
     timer/timeraepwidget.cpp \
     timer/timerinterface.cpp \
     timer/timerpemiwidget.cpp \
-    treeitem.cpp
+    treeitem.cpp \
+    verification/dataverification.cpp
 
 
 HEADERS += \
     chronometr.h \
-    dataverification.h \
     generator/generatoraepwidget.h \
     generator/generatorpemiwidget.h \
     generator/report/reportaepwidget.h \
@@ -62,7 +61,8 @@ HEADERS += \
     timer/timeraepwidget.h \
     timer/timerinterface.h \
     timer/timerpemiwidget.h \
-    treeitem.h
+    treeitem.h \
+    verification/dataverification.h
 
 
 FORMS += \
