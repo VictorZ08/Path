@@ -3,47 +3,60 @@
 #include <fstream>
 #include <QDebug>
 
+#include <functional>
+#include <algorithm>
+#include <cctype>
+#include <string>
+#include <QRegularExpression>
+
 constexpr int limitCountLineFile = 15;
-//const QString kLogLevelDebug = "Не цифровой символ";
-//const QString kLogLevelDebug = "Не цифровой символ";
+constexpr int limitCountTab = 15;
 
-void DataVerificationAep::checkFiles(const QFileInfoList& inFiles)
+DataVerificationAep::DataVerificationAep(const QFileInfoList& inFiles)
+    : checkFiles{inFiles}
 {
-    QPair<QStringList, QStringList> checkError;
+    qDebug()<<"Create DataVerificationAep";
+}
 
-    for(auto& file : inFiles) {
+QStringList DataVerificationAep::startCheckFiles()
+{
+    QStringList reportErrors;
+    QPair<QStringList, QStringList> loadErrors;
+
+    for(auto& file : checkFiles) {
 
         if(readFile(file.absoluteFilePath())) {
-            checkError.first.append("Файл не открывается!");
-            checkError.second.append(file.absoluteFilePath());
+            loadErrors.first.append("Повреждённые файлы: ");
+            loadErrors.second.append(file.absoluteFilePath());
             continue;
         }
 
-        /*if() {
-
+        if(isDigitals(m_buffer)) {
+            loadErrors.first.append("В файлах имеются буквы: ");
+            loadErrors.second.append(file.absoluteFilePath());
         }
 
-        if() {
-
+        if(isModes(file.absoluteFilePath())) {
+            loadErrors.first.append("В имени файла отсутствует вкл/выкл: ");
+            loadErrors.second.append(file.absoluteFilePath());
         }
 
-        if() {
-
+        if(isCountLineFile(m_buffer)) {
+            loadErrors.first.append("В файлах имеется превышение количества строк: ");
+            loadErrors.second.append(file.absoluteFilePath());
         }
 
-        if() {
-
+        if(compareResistance(m_buffer)) {
+            loadErrors.first.append("Файлы имеют разное сопротивление: ");
+            loadErrors.second.append(file.absoluteFilePath());
         }
-
-        if() {
-
-        }
-
-        if() {
-
-        }*/
-
     }
+
+    if(isEvenFiles(checkFiles)) {
+        loadErrors.first.append("Комплекты имеют не чётное количество файлов: ");
+        loadErrors.second.append(checkFiles.at(0).absoluteFilePath());
+    }
+return reportErrors;
 }
 
 //-------------------------------------
@@ -62,17 +75,21 @@ bool DataVerificationAep::readFile(const QString& inPathFile) const
 return false;
 }
 
-bool DataVerificationAep::isDigitals(QStringView inStr) const
+bool DataVerificationAep::isDigitals(const QString& inBuffer) const
 {
-    /*QString::const_iterator it = std::find(inStr.begin(), inStr.end(),
-                                           std::not1(std::ptr_fun(::isdigit)));
-    return it == inStr.end();*/
+    //QString str("\n.-.01-23\n45.67f89.\n");
+    QRegularExpression re("^[\\s0-9.-]+$", QRegularExpression::CaseInsensitiveOption);
+    QRegularExpressionMatch match = re.match(inBuffer);
+    if (!match.hasMatch()) {
+        return true;
+    }
+    return false;
 }
 
-bool DataVerificationAep::isModes(const QString& inNameFiles) const
+bool DataVerificationAep::isModes(const QString& inNameFile) const
 {
-    if(inNameFiles.contains("выкл", Qt::CaseInsensitive) ||
-       inNameFiles.contains("вкл", Qt::CaseInsensitive))
+    if(inNameFile.contains("выкл", Qt::CaseInsensitive) ||
+       inNameFile.contains("вкл", Qt::CaseInsensitive))
     {
         return true;
     }
@@ -84,23 +101,24 @@ bool DataVerificationAep::isEvenFiles(const QFileInfoList& inFiles) const
     return inFiles.count() % 2 == 0;
 }
 
-bool DataVerificationAep::isCountLineFile(const QString& inNameFile) const
+bool DataVerificationAep::isCountLineFile(const QString& inBuffer) const
 {
-    std::ifstream  in("C:/1.txt");
-    if(!in.is_open()){
-       qDebug()<<"no open";
-    }
-    size_t line = std::count(std::istreambuf_iterator<char>(in),
-                 std::istreambuf_iterator<char>(), '\n');
+    size_t line = inBuffer.count('\n');
 
     qDebug()<<"line: " << line;
-    if(line < limitCountLineFile)
+    if(line == limitCountLineFile)
         return false;
 
-return true;
+    return true;
 }
 
-bool DataVerificationAep::compareResistance(const QStringList& inStr) const
+bool DataVerificationAep::isCountTab(const QString& inBuffer) const
+{
+    int res = inBuffer.count('\t');
+    return res == limitCountTab ? false : true;
+}
+
+bool DataVerificationAep::compareResistance(QStringView inStr) const
 {
     /*QString tempBuffOneStr = inBuff.left(inBuff.indexOf('\n', 1)).toString();
 

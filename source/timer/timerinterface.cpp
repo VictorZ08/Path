@@ -4,6 +4,7 @@
 #include "random/random.h"
 #include "timer.h"
 #include "modes/systemtray.h"
+#include "verification/dataverification.h"
 
 #include <QMimeData>
 #include <QDragEnterEvent>

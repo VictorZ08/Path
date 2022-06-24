@@ -5,25 +5,34 @@
 #include <QFileInfoList>
 #include <QDebug>
 
+using  pairSLSL = QPair<QStringList, QStringList>;
+
 class DataVerificationAep
 {   
 public:
-    void checkFiles(const QFileInfoList& inFiles);
-    //DataVerificationAep() = delete;
- bool isCountLineFile(const QString& inNameFile) const;
+    DataVerificationAep(const QFileInfoList& inFiles);
+    QStringList startCheckFiles();
+
+    DataVerificationAep (const DataVerificationAep& lhs) = delete;
+    DataVerificationAep& operator=(const DataVerificationAep& lhs) = delete;
+
 protected:
-    bool isDigitals(QStringView inStr) const;
-    bool isModes(const QString& inNameFiles) const;
+    bool isDigitals(const QString& inBuffer) const;
+    bool isModes(const QString& inNameFile) const;
     bool isEvenFiles(const QFileInfoList& inFiles) const;
-    //bool isCountLineFile(const QString& inNameFile) const;
-    bool compareResistance(const QStringList& inStr) const;
+    bool isCountLineFile(const QString& inBuffer) const;
+    bool isCountTab(const QString& inBuffer) const;
+    bool compareResistance(QStringView inStr) const;
 
 private:
+    //bool operator==(char c) { return (::isdigit(c)); }
     //void loadFile(const QString &fileName);////
     //bool openFile(const QString &inNameFile);
     bool readFile(const QString& inPathFile) const;
 
 private:
+    QFileInfoList checkFiles;
+
     mutable QString m_buffer;
 };
 
