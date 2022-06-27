@@ -2,7 +2,7 @@ include (C:/Users/Victor/Documents/Path/libs/QtXlsx/QtXlsxWriter-master/QtXlsxWr
 
 QT       += core gui
 QT       += sql
-
+QT       += concurrent
 #QMAKE_CXXFLAGS+=-Zi
 #QMAKE_LFLAGS+=/DEBUG
 

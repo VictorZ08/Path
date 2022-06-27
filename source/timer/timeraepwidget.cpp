@@ -6,6 +6,8 @@
 
 #include <QDebug>
 
+static double m_step = 0.0;
+
 //-------------------------------
 TimerAepWidget::TimerAepWidget(SystemTray* inSysTray,
                                QWidget* inParent)
@@ -19,8 +21,11 @@ TimerAepWidget::TimerAepWidget(SystemTray* inSysTray,
     initEventFiter();
 
     ui->m_loadSets_tw->setAttribute(Qt::WA_AcceptDrops, true);
-    statusGeneratesFiles("color: rgb(0, 0, 0)",
-                         "Статус:-");
+    ui->m_timeSet_le->setText(QString::number(kTimeSetAep));
+    ui->m_minTimeModes_le->setText(QString::number(kMinTimeModeAep));
+    ui->m_maxTimeModes_le->setText(QString::number(kMaxTimeModeAep));
+
+    ui->m_status_prb->setValue(0);
 
     qDebug()<<"Create TimerAepWidget";
 }
@@ -53,8 +58,20 @@ void TimerAepWidget::connectSlots() const
     connect(ui->m_timeSet_le, SIGNAL(textChanged(const QString &)),
             this, SLOT(m_previewTime_le_changed()));
 
+    connect(ui->m_minTimeModes_le, SIGNAL(textChanged(const QString &)),
+            this, SLOT(m_previewTime_le_changed()));
+
+    connect(ui->m_maxTimeModes_le, SIGNAL(textChanged(const QString &)),
+            this, SLOT(m_previewTime_le_changed()));
+
+    connect(ui->m_fixedTime_ckb, SIGNAL(stateChanged(int)),
+            this, SLOT(m_previewTime_le_changed()));
+
     connect(this, SIGNAL(emitPreviewTime()),
             this, SLOT(m_previewTime_le_changed()));
+
+    connect(this, SIGNAL(emitStatus_prb()), this,
+            SLOT(m_progress_prb_tempStart()), Qt::DirectConnection);
 }
 
 /**
@@ -80,7 +97,10 @@ void TimerAepWidget::initEventFiter()
 void TimerAepWidget::m_clear_pb_clicked()
 {
     clearWiget();
-    statusGeneratesFiles("color: rgb(0, 0, 0)", "Статус:-");
+    ui->m_timeSet_le->setText(QString::number(kTimeSetAep));
+    ui->m_minTimeModes_le->setText(QString::number(kMinTimeModeAep));
+    ui->m_maxTimeModes_le->setText(QString::number(kMaxTimeModeAep));
+    ui->m_status_prb->setValue(0);
 }
 
 /**
@@ -106,22 +126,29 @@ void TimerAepWidget::m_previewTime_le_changed()
     @brief TimerAepWidget::m_start_pb_clicked
     Запуск перетасовки файлов и присвоения им время
 */
-#include <random>
 void TimerAepWidget::m_start_pb_clicked()
 {
+    m_step = 0;
     QVector<QDateTime>::iterator itDateTime = getDateTime().begin();
 
-    Set& sets = getSetsInTree();
-    shuffleFiles(sets.getSetsAep());
-    sortFilesToComplectAep(sets);
-    //for(auto& set: sets.getSetsAep()) {
-        //sortFilesToComplectAep(sets);
-        //Timer::setDateTimeFile(set.first, *itDateTime++);
-        //for(auto& files: set.second) {
-            //Timer::setDateTimeFile(files, *itDateTime++);
-        //}
-    //}
+    Set& setsTree = getSetsInTree();
+    ui->m_status_prb->setMaximum(setsTree.getSetsAep().count());
+
+    shuffleFiles(setsTree.getSetsAep());
+    sortFilesToComplectAep(setsTree);
+    for(auto& set: setsTree.getSetsAep()) {
+        emit emitStatus_prb();
+        setDateTimeFiles(set.first, *itDateTime++);
+        for(auto& files: set.second) {
+            setDateTimeFiles(files, *itDateTime++);
+        }
+    }
     statusGeneratesFiles("color: rgb(255, 255, 255)",
                          "Статус: Готов");
 }
 
+void TimerAepWidget::m_progress_prb_tempStart()
+{
+    ++m_step;
+    ui->m_status_prb->setValue(m_step);
+}

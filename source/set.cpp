@@ -102,3 +102,12 @@ void Set::clear()
     m_setsAep.clear();
 }
 
+size_t Set::countFilesAllSetsAep()
+{
+    size_t sum = m_setsAep.count();
+    for(auto&set : m_setsAep) {
+        sum += set.second.count();
+    }
+return sum;
+}
+

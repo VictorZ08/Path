@@ -13,13 +13,18 @@ public:
     static double randOneStringAep(const double inVal);
 
     static QVector<QDateTime> randTimeAep(const QDateTime& inStartTime,
-                                          const quint64 inNumFilesInSet,
-                                          const quint64 inNumSets,
-                                          const quint64 inTimeBetweenSets);
+                                          const int inNumFilesInSet,
+                                          const int inNumSets,
+                                          const int inMinTimeModes,
+                                          const int inMaxTimeModes,
+                                          const int inTimeBetweenSets);
 
     static QVector<QDateTime> randTimePemi(const QDateTime& inStartTime,
                                            const quint64 inNumSets,
                                            const quint64 inTimeBetweenSets);
+
+    static QVector<QDateTime> randTimeFixed(const QDateTime& inStartTime,
+                                            const int inNumSets);
 
 public:
     static bool checkBreak(const QDateTime& inDateTime);

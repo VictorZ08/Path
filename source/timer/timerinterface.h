@@ -10,6 +10,7 @@ class QTreeWidget;
 class QDateTimeEdit;
 class QLineEdit;
 class QLabel;
+class QCheckBox;
 class SystemTray;
 class Set;
 
@@ -44,6 +45,11 @@ protected:
     virtual bool eventFilter(QObject* inTarget,
                              QEvent* inEvent) override;
 
+    static constexpr int kTimeSetAep = 10;
+    static constexpr int kMinTimeModeAep = 5;
+    static constexpr int kMaxTimeModeAep = 8;
+    static constexpr int kTimeSetPemi = 50;
+
 signals:
     void emitPreviewTime();
 
@@ -51,10 +57,13 @@ private:
     QTreeWidget* m_loadSets_tw    = nullptr;
     QDateTimeEdit* m_editTime_dte = nullptr;
     QLineEdit* m_timeSet_le       = nullptr;
+    QLineEdit* m_minTimeModes_le  = nullptr;
+    QLineEdit* m_maxTimeModes_le  = nullptr;
     QLineEdit *m_previewTime_le   = nullptr;
     QLineEdit* m_numSets_le       = nullptr;
     QLineEdit* m_saveSets_le      = nullptr;
     QLabel* m_status_l            = nullptr;
+    QCheckBox* m_fixedTime_ckb     = nullptr;
     SystemTray* m_sysTray         = nullptr;
 
     QVector<QDateTime>  m_dateTime;
@@ -63,6 +72,7 @@ private:
     Set                 m_tempBufferLoadData;//?????
 
     bool m_checkStatusLoadTree = true;
+
 };
 
 #endif // TIMERINTERFACE_H

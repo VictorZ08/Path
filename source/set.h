@@ -21,6 +21,7 @@ public:
 
     size_t countSetsPemi() { return m_setsPemi.count(); }
     size_t countSetsAep() { return m_setsAep.count(); }
+    size_t countFilesAllSetsAep();
     QFileInfoList& getSetsPemi() { return m_setsPemi; } //const
     QVector<pairFiFiL>& getSetsAep() { return m_setsAep; } //const
 

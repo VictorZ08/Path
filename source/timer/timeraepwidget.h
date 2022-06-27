@@ -29,8 +29,11 @@ private slots:
     void m_start_pb_clicked();
     void m_previewTime_le_changed();
 
+    void m_progress_prb_tempStart();
+
 signals:
     void emitBackUi();
+    void emitStatus_prb();
 
 private:
     Ui::TimerAepWidget* ui = nullptr;

@@ -9,8 +9,6 @@ const QTime k_eveningBreakBeg (16,00);
 const QTime k_eveningBreakEnd (16,30);
 
 constexpr quint32 kLimitFood = 1800;//Время перекуса: 30 мин * 60 сек = 1800
-constexpr quint32 kMinTimeFile = 5;
-constexpr quint32 kMaxTimeFile = 8;
 constexpr quint32 kMinute = 60;
 
 /**
@@ -47,26 +45,30 @@ double Random::randOneStringAep(const double inVal)
     @param inStartTime начальное время
     @param inNumFilesInSet количество файлов
     @param inNumSets количество комплектов
+    @param inMinTimeModes миним. время на режим
+    @param inMaxTimeModes макс. аремя на режим
     @param inTimeBetweenSets разброс времени между комплектами
     @return возвращает контейнер сгенерированных значений
 */
 QVector<QDateTime> Random::randTimeAep(const QDateTime& inStartTime,
-                               const quint64 inNumFilesInSet,
-                               const quint64 inNumSets,
-                               const quint64 inTimeBetweenSets)
+                               const int inNumFilesInSet,
+                               const int inNumSets,
+                               const int inMinTimeModes,
+                               const int inMaxTimeModes,
+                               const int inTimeBetweenSets)
 {
     //Получаем процентное соотношение
-    quint64 percent = (inTimeBetweenSets*10)/100;
-    quint64 folderInSet = 1;
+    int percent = (inTimeBetweenSets*10)/100;
+    int folderInSet = 1;
     QVector<QDateTime> sumDateTime;
     sumDateTime.reserve((inNumFilesInSet + folderInSet) * inNumSets);
 
     QDateTime tmpDateTime = inStartTime;
-    quint64 toSec = 0;
+    int toSec = 0;
     bool fOneComlect = false;
     sumDateTime.push_back(inStartTime);
 
-    for(quint64 i = 0; i < inNumSets; ++i) {
+    for(int i = 0; i < inNumSets; ++i) {
         if(fOneComlect == true) {
             toSec = RandomValues::get(inTimeBetweenSets - percent,
                                       inTimeBetweenSets + percent)*kMinute;
@@ -80,11 +82,11 @@ QVector<QDateTime> Random::randTimeAep(const QDateTime& inStartTime,
         }        
         fOneComlect = true;
 
-        for(quint64 i = 0; i < inNumFilesInSet; ++i) {
-           toSec = RandomValues::get(kMinTimeFile, kMaxTimeFile)*kMinute;
+        for(int i = 0; i < inNumFilesInSet; ++i) {
+           toSec = RandomValues::get(inMinTimeModes, inMaxTimeModes)*kMinute;
            tmpDateTime = tmpDateTime.addSecs(toSec);
            while (checkBreak(tmpDateTime)) {
-               toSec = RandomValues::get(kMinTimeFile, kMaxTimeFile)*kMinute;
+               toSec = RandomValues::get(inMinTimeModes, inMaxTimeModes)*kMinute;
                tmpDateTime = tmpDateTime.addSecs(toSec);
            }
            sumDateTime.push_back(tmpDateTime);
@@ -135,6 +137,24 @@ QVector<QDateTime> Random::randTimePemi(const QDateTime& inStartTime,
             vecDateTime.replace(i, vecDateTime.at(i).addSecs(kLimitFood));
         else if(checkBreak(vecDateTime.at(i)))
             vecDateTime.replace(i, vecDateTime.at(i).addSecs(kLimitFood));
+    }
+return vecDateTime;
+}
+
+/**
+    @brief Random::randTimeFixed
+    заполняет контейнер фиксированными значениями
+    @param inStartTime начальное время
+    @param inNumSets количество комплектов
+    @return возвращает контейнер сгенерированных значений
+*/
+QVector<QDateTime> Random::randTimeFixed(const QDateTime& inStartTime,
+                                         const int inNumSets)
+{
+    QVector<QDateTime> vecDateTime;
+    vecDateTime.reserve(inNumSets);
+    for(int i = 0; i < inNumSets; ++i) {
+        vecDateTime.push_back(inStartTime);
     }
 return vecDateTime;
 }

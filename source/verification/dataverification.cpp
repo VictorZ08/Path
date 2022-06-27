@@ -13,7 +13,7 @@ constexpr int limitCountLineFile = 15;
 constexpr int limitCountTab = 15;
 
 DataVerificationAep::DataVerificationAep(const QFileInfoList& inFiles)
-    : checkFiles{inFiles}
+    : m_checkFiles{inFiles}
 {
     qDebug()<<"Create DataVerificationAep";
 }
@@ -23,7 +23,7 @@ QStringList DataVerificationAep::startCheckFiles()
     QStringList reportErrors;
     QPair<QStringList, QStringList> loadErrors;
 
-    for(auto& file : checkFiles) {
+    for(auto& file : m_checkFiles) {
 
         if(readFile(file.absoluteFilePath())) {
             loadErrors.first.append("Повреждённые файлы: ");
@@ -52,9 +52,9 @@ QStringList DataVerificationAep::startCheckFiles()
         }
     }
 
-    if(isEvenFiles(checkFiles)) {
+    if(isEvenFiles(m_checkFiles)) {
         loadErrors.first.append("Комплекты имеют не чётное количество файлов: ");
-        loadErrors.second.append(checkFiles.at(0).absoluteFilePath());
+        loadErrors.second.append(m_checkFiles.at(0).absoluteFilePath());
     }
 return reportErrors;
 }
@@ -77,7 +77,6 @@ return false;
 
 bool DataVerificationAep::isDigitals(const QString& inBuffer) const
 {
-    //QString str("\n.-.01-23\n45.67f89.\n");
     QRegularExpression re("^[\\s0-9.-]+$", QRegularExpression::CaseInsensitiveOption);
     QRegularExpressionMatch match = re.match(inBuffer);
     if (!match.hasMatch()) {

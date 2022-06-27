@@ -25,14 +25,10 @@ protected:
     bool compareResistance(QStringView inStr) const;
 
 private:
-    //bool operator==(char c) { return (::isdigit(c)); }
-    //void loadFile(const QString &fileName);////
-    //bool openFile(const QString &inNameFile);
     bool readFile(const QString& inPathFile) const;
 
 private:
-    QFileInfoList checkFiles;
-
+    QFileInfoList m_checkFiles;
     mutable QString m_buffer;
 };
 
