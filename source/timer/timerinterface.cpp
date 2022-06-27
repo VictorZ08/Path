@@ -4,19 +4,21 @@
 #include "random/random.h"
 #include "timer.h"
 #include "modes/systemtray.h"
+#include "verification/dataverification.h"
 
 #include <QMimeData>
 #include <QDragEnterEvent>
 #include <QCoreApplication>
 #include <QTreeWidget>
 #include <QLineEdit>
+#include <QCheckBox>
 #include <QDateTimeEdit>
 #include <QLabel>
 #include <QDir>
 
 #include <QDebug>
 
-constexpr quint64 kTimeSet = 50;
+//static constexpr quint64 kTimeSetAep = 10;
 
 TimerInterface::TimerInterface(SystemTray* inSysTray,
                                QWidget* inParent)
@@ -141,8 +143,11 @@ void TimerInterface::dropEventTreeWidget()
 */
 void TimerInterface::previewTime()
 {
-    quint64 timeSet = m_timeSet_le->text().toInt();
+    int timeSet = m_timeSet_le->text().toInt();
     m_beginWorkTime = m_editTime_dte->dateTime();
+    int minTimeModes = m_minTimeModes_le->text().toInt();
+    int maxTimeModes = m_maxTimeModes_le->text().toInt();
+    bool checkFixedTime = m_fixedTime_ckb->isChecked();
     m_dateTime.clear();
 
     QString strObjectName = this->objectName();
@@ -160,23 +165,34 @@ void TimerInterface::previewTime()
     else if(strObjectName.contains("aep", Qt::CaseInsensitive)){
         if(m_loadSetsTree.getSetsAep().count() != 0) {
 
-            quint64 numFilesInSet = m_loadSetsTree.getSetsAep().at(0).second.count();
-            quint64 numSets;
+            int numFilesInSet = m_loadSetsTree.getSetsAep().at(0).second.count();
+            int numSets;
             if(m_numSets_le != nullptr)
                 numSets = m_numSets_le->text().toInt();
             else
                 numSets = m_loadSetsTree.getSetsAep().count();
 
-            m_dateTime = Random::randTimeAep(m_beginWorkTime,
-                                             numFilesInSet,
-                                             numSets,
-                                             timeSet);
+            if(checkFixedTime == true) {
+                size_t sumFiles = m_loadSetsTree.countFilesAllSetsAep();
+                qDebug()<<sumFiles;
+                m_dateTime = Random::randTimeFixed(m_beginWorkTime,
+                                                   sumFiles);
+                qDebug()<<m_dateTime.back();
+            }
+            else {
+                m_dateTime = Random::randTimeAep(m_beginWorkTime,
+                                                 numFilesInSet,
+                                                 numSets,
+                                                 minTimeModes,
+                                                 maxTimeModes,
+                                                 timeSet);
+            }
         }
     }
+
     if(!m_dateTime.isEmpty()) {
         m_previewTime_le->setText((m_dateTime.back()).toString("dd.MM.yyyy hh:mm"));
     }
-    statusGeneratesFiles("color: rgb(0, 0, 0)", "Статус:-");
 }
 
 /**
@@ -187,11 +203,13 @@ void TimerInterface::setParentWiget(const QObject* inObj)
 {
     m_loadSets_tw = inObj->findChild<QTreeWidget *>("m_loadSets_tw");
     m_timeSet_le = inObj->findChild<QLineEdit *>("m_timeSet_le");
+    m_minTimeModes_le = inObj->findChild<QLineEdit *>("m_minTimeModes_le");
+    m_maxTimeModes_le = inObj->findChild<QLineEdit *>("m_maxTimeModes_le");
     m_previewTime_le = inObj->findChild<QLineEdit *>("m_previewTime_le");
     m_numSets_le = inObj->findChild<QLineEdit *>("m_numSets_le");
     m_saveSets_le = inObj->findChild<QLineEdit *>("m_saveSets_le");
     m_editTime_dte = inObj->findChild<QDateTimeEdit *>("m_editTime_dte");
-    m_status_l = inObj->findChild<QLabel *>("m_status_l");
+    m_fixedTime_ckb = inObj->findChild<QCheckBox *>("m_fixedTime_ckb");
 
     initCurrentTimeWidget();
 }
@@ -204,7 +222,7 @@ void TimerInterface::initCurrentTimeWidget()
 {
     m_previewTime_le->setText("");
     m_editTime_dte->setDateTime(m_beginWorkTime);
-    m_timeSet_le->setText(QString::number(kTimeSet));
+    //m_timeSet_le->setText(QString::number(kTimeSet));
 }
 
 /**
@@ -216,7 +234,7 @@ void TimerInterface::clearWiget()
     m_loadSets_tw->clear();
     m_dateTime.clear();
     m_loadSetsTree.clear();
-    m_timeSet_le->setText(QString::number(kTimeSet));
+    //m_timeSet_le->setText(QString::number(kTimeSet));
 }
 
 /**
@@ -229,8 +247,8 @@ void TimerInterface::clearWiget()
 void TimerInterface::statusGeneratesFiles(const QString& inColor,
                                           const QString& inStatus)
 {
-    m_status_l->setStyleSheet(inColor);
-    m_status_l->setText(inStatus);
+    /*m_status_l->setStyleSheet(inColor);
+    m_status_l->setText(inStatus);*/
 }
 
 /**

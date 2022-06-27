@@ -2,7 +2,7 @@ include (C:/Users/Victor/Documents/Path/libs/QtXlsx/QtXlsxWriter-master/QtXlsxWr
 
 QT       += core gui
 QT       += sql
-
+QT       += concurrent
 #QMAKE_CXXFLAGS+=-Zi
 #QMAKE_LFLAGS+=/DEBUG
 
@@ -15,7 +15,6 @@ CONFIG += c++11
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
-    dataverification.cpp \
     generator/generatoraepwidget.cpp \
     generator/generatorpemiwidget.cpp \
     generator/report/reportaepwidget.cpp \
@@ -36,12 +35,13 @@ SOURCES += \
     timer/timeraepwidget.cpp \
     timer/timerinterface.cpp \
     timer/timerpemiwidget.cpp \
-    treeitem.cpp
+    treeitem.cpp \
+    verification/dataverification.cpp \
+    verification/logger.cpp
 
 
 HEADERS += \
     chronometr.h \
-    dataverification.h \
     generator/generatoraepwidget.h \
     generator/generatorpemiwidget.h \
     generator/report/reportaepwidget.h \
@@ -62,7 +62,9 @@ HEADERS += \
     timer/timeraepwidget.h \
     timer/timerinterface.h \
     timer/timerpemiwidget.h \
-    treeitem.h
+    treeitem.h \
+    verification/dataverification.h \
+    verification/logger.h
 
 
 FORMS += \
@@ -74,7 +76,8 @@ FORMS += \
     modes/passwidget.ui \
     search/searchfileswidget.ui \
     timer/timeraepwidget.ui \
-    timer/timerpemiwidget.ui
+    timer/timerpemiwidget.ui \
+    verification/logger.ui
 
 
 # Default rules for deployment.
