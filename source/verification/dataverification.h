@@ -10,8 +10,10 @@ using  pairSLSL = QPair<QStringList, QStringList>;
 class DataVerificationAep
 {   
 public:
-    DataVerificationAep(const QFileInfoList& inFiles);
-    QStringList startCheckFiles();
+    DataVerificationAep();
+
+    void pushData(const QFileInfoList& inFiles);
+    QStringList checkFiles();
 
     DataVerificationAep (const DataVerificationAep& lhs) = delete;
     DataVerificationAep& operator=(const DataVerificationAep& lhs) = delete;

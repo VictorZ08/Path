@@ -27,7 +27,7 @@ protected:
     void outputDataFile(QFileInfo& inNameFolderOut,
                         QFileInfoList::ConstIterator it);
 
-    virtual void closeEvent(QCloseEvent* inEvent)  override;
+    virtual void closeEvent(QCloseEvent* inEvent) override;
 
 signals:
     void emitBackUi();

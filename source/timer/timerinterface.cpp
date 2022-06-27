@@ -18,8 +18,6 @@
 
 #include <QDebug>
 
-//static constexpr quint64 kTimeSetAep = 10;
-
 TimerInterface::TimerInterface(SystemTray* inSysTray,
                                QWidget* inParent)
         : QDialog(inParent)
@@ -222,7 +220,6 @@ void TimerInterface::initCurrentTimeWidget()
 {
     m_previewTime_le->setText("");
     m_editTime_dte->setDateTime(m_beginWorkTime);
-    //m_timeSet_le->setText(QString::number(kTimeSet));
 }
 
 /**
@@ -234,7 +231,6 @@ void TimerInterface::clearWiget()
     m_loadSets_tw->clear();
     m_dateTime.clear();
     m_loadSetsTree.clear();
-    //m_timeSet_le->setText(QString::number(kTimeSet));
 }
 
 /**
