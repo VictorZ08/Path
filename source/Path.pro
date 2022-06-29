@@ -37,7 +37,7 @@ SOURCES += \
     timer/timerpemiwidget.cpp \
     treeitem.cpp \
     verification/dataverification.cpp \
-    verification/logger.cpp
+    verification/loggerwidget.cpp
 
 
 HEADERS += \
@@ -64,7 +64,7 @@ HEADERS += \
     timer/timerpemiwidget.h \
     treeitem.h \
     verification/dataverification.h \
-    verification/logger.h
+    verification/loggerwidget.h
 
 
 FORMS += \
@@ -77,7 +77,7 @@ FORMS += \
     search/searchfileswidget.ui \
     timer/timeraepwidget.ui \
     timer/timerpemiwidget.ui \
-    verification/logger.ui
+    verification/loggerwidget.ui
 
 
 # Default rules for deployment.

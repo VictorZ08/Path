@@ -1,5 +1,7 @@
 #include "ui_timeraepwidget.h"
 #include "timeraepwidget.h"
+#include "verification/loggerwidget.h"
+#include "verification/dataverification.h"
 
 #include "sortfiles.h"
 #include "timer.h"
@@ -13,6 +15,7 @@ TimerAepWidget::TimerAepWidget(SystemTray* inSysTray,
                                QWidget* inParent)
             : TimerInterface(inSysTray, inParent)
             , ui(new Ui::TimerAepWidget)
+            , m_logger(new LoggerWidget(inSysTray, this))
 {
     ui->setupUi(this);
 
@@ -67,11 +70,20 @@ void TimerAepWidget::connectSlots() const
     connect(ui->m_fixedTime_ckb, SIGNAL(stateChanged(int)),
             this, SLOT(m_previewTime_le_changed()));
 
+    connect(ui->m_report_pb, SIGNAL(clicked(bool)),
+            this, SLOT(m_report_pb_clicked()));
+
+    connect(ui->m_startCheckData_pb, SIGNAL(clicked(bool)),
+            this, SLOT(m_startCheckData_pb_clicked()));
+
     connect(this, SIGNAL(emitPreviewTime()),
             this, SLOT(m_previewTime_le_changed()));
 
     connect(this, SIGNAL(emitStatus_prb()), this,
             SLOT(m_progress_prb_tempStart()), Qt::DirectConnection);
+
+    connect(m_logger, SIGNAL(emitBackUi()),
+            this, SLOT(showForm()));
 }
 
 /**
@@ -88,6 +100,11 @@ void TimerAepWidget::initEventFiter()
     ui->m_editTime_dte->installEventFilter(this);
     ui->m_previewTime_le->setEnabled(false);
     ui->m_start_pb->installEventFilter(this);
+    ui->m_startCheckData_pb->installEventFilter(this);
+    ui->m_report_pb->installEventFilter(this);
+    ui->m_minTimeModes_le->installEventFilter(this);
+    ui->m_maxTimeModes_le->installEventFilter(this);
+    ui->m_fixedTime_ckb->installEventFilter(this);
 }
 
 /**
@@ -147,8 +164,45 @@ void TimerAepWidget::m_start_pb_clicked()
                          "Статус: Готов");
 }
 
+/**
+    @brief TimerAepWidget::m_progress_prb_tempStart
+    Увеличивает состояние прогрессбар
+*/
 void TimerAepWidget::m_progress_prb_tempStart()
 {
     ++m_step;
     ui->m_status_prb->setValue(m_step);
+}
+
+void TimerAepWidget::m_report_pb_clicked()
+{
+    this->hide();
+    m_logger->setError(m_reportError);
+    m_logger->show();
+}
+
+void TimerAepWidget::m_startCheckData_pb_clicked()
+{
+    DataVerificationAep dv;
+    Set& setsTree = getSetsInTree();
+    ui->m_status_prb->setMaximum(setsTree.getSetsAep().count());
+    for(auto& set: setsTree.getSetsAep()) {
+        dv.checkFiles(set.second);        
+        emit emitStatus_prb();
+    }
+
+    m_reportError = dv.getData();
+    if(m_reportError.isEmpty())
+        ui->m_report_pb->setStyleSheet("background-color: green;");
+    else
+        ui->m_report_pb->setStyleSheet("background-color: red;");
+}
+
+/**
+    @brief TimerAepWidget::showForm
+    Вывод формы
+*/
+void TimerAepWidget::showForm()
+{
+    this->show();
 }

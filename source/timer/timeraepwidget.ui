@@ -84,7 +84,7 @@
           </widget>
          </item>
          <item>
-          <widget class="QPushButton" name="pushButton">
+          <widget class="QPushButton" name="m_report_pb">
            <property name="text">
             <string>Отчёт</string>
            </property>

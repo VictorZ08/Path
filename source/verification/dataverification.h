@@ -10,8 +10,10 @@ using  pairSLSL = QPair<QStringList, QStringList>;
 class DataVerificationAep
 {   
 public:
-    DataVerificationAep(const QFileInfoList& inFiles);
-    QStringList startCheckFiles();
+    DataVerificationAep();
+
+    QStringList getData();
+    void checkFiles(const QFileInfoList &inFiles);
 
     DataVerificationAep (const DataVerificationAep& lhs) = delete;
     DataVerificationAep& operator=(const DataVerificationAep& lhs) = delete;
@@ -28,7 +30,7 @@ private:
     bool readFile(const QString& inPathFile) const;
 
 private:
-    QFileInfoList m_checkFiles;
+    QMultiMap<QString, QString> m_loadErrors;
     mutable QString m_buffer;
 };
 
