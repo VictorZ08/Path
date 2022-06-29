@@ -145,7 +145,6 @@ void TimerAepWidget::m_previewTime_le_changed()
 */
 void TimerAepWidget::m_start_pb_clicked()
 {
-    m_step = 0;
     QVector<QDateTime>::iterator itDateTime = getDateTime().begin();
 
     Set& setsTree = getSetsInTree();
@@ -183,11 +182,15 @@ void TimerAepWidget::m_report_pb_clicked()
 
 void TimerAepWidget::m_startCheckData_pb_clicked()
 {
+    if(getStatusLoadTree() == true)
+        return;
+
+    m_step = 0;
     DataVerificationAep dv;
     Set& setsTree = getSetsInTree();
     ui->m_status_prb->setMaximum(setsTree.getSetsAep().count());
     for(auto& set: setsTree.getSetsAep()) {
-        dv.checkFiles(set.second);        
+        dv.checkFiles(set.second);
         emit emitStatus_prb();
     }
 

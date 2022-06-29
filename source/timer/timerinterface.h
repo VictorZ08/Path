@@ -25,6 +25,8 @@ public:
                             QWidget* inParent = nullptr);
     virtual ~TimerInterface();
 
+    bool getStatusLoadTree() const { return m_checkStatusLoadTree;}
+
 protected:
     void previewTime();
     void clearWiget();
@@ -72,7 +74,6 @@ private:
     Set                 m_tempBufferLoadData;//?????
 
     bool m_checkStatusLoadTree = true;
-
 };
 
 #endif // TIMERINTERFACE_H
