@@ -231,6 +231,7 @@ void TimerInterface::clearWiget()
     m_loadSets_tw->clear();
     m_dateTime.clear();
     m_loadSetsTree.clear();
+    m_checkStatusLoadTree = true;
 }
 
 /**

@@ -9,6 +9,7 @@ LoggerWidget::LoggerWidget(SystemTray* inSysTray,
             , ui(new Ui::LoggerWidget)
 {
     ui->setupUi(this);
+
     qDebug()<<"Create LoggerWidget";
 }
 
