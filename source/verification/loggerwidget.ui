@@ -20,7 +20,13 @@
   </property>
   <layout class="QGridLayout" name="gridLayout">
    <item row="0" column="0">
-    <widget class="QListView" name="m_reportError_lv"/>
+    <widget class="QTextEdit" name="m_reportError_te">
+     <property name="font">
+      <font>
+       <pointsize>10</pointsize>
+      </font>
+     </property>
+    </widget>
    </item>
   </layout>
  </widget>

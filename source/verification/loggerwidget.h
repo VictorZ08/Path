@@ -16,8 +16,10 @@ public:
                           QWidget* inParent  = nullptr);
     ~LoggerWidget();
 
+    void setError(const QStringList& inErrors);
+
 protected:
-    void initEventFiter();
+    void initEventFilter();
     virtual void closeEvent(QCloseEvent* inEvent) override;
 
 signals:

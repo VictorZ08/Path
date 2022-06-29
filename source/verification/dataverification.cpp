@@ -17,57 +17,71 @@ DataVerificationAep::DataVerificationAep()
     qDebug()<<"Create DataVerificationAep";
 }
 
-void DataVerificationAep::pushData(const QFileInfoList &inFiles)
-{
-    m_checkFiles.clear();
-    m_checkFiles = inFiles;
-}
-
-QStringList DataVerificationAep::checkFiles()
+QStringList DataVerificationAep::getData()
 {
     QStringList reportErrors;
-    QVector<QPair<QString, QStringList>> loadErrors;
-    loadErrors.reserve(7);
+    if(m_loadErrors.isEmpty()){
+        return reportErrors;
+    }
 
-    for(auto& file : m_checkFiles) {
+    QMultiMap<QString, QString>::iterator itLeft = m_loadErrors.begin();
+    QMultiMap<QString, QString>::iterator itRight = m_loadErrors.begin() + 1;
+    reportErrors.append(itLeft.key());
+    reportErrors.append(itLeft.value());
+    for( ; itRight != m_loadErrors.end(); ++itRight) {
+        if(itLeft.key() == itRight.key()) {
+            reportErrors.append(itRight.value());
+        }
+        else {
+            itLeft = itRight;
+            reportErrors.append("\n");
+            reportErrors.append(itLeft.key());
+            reportErrors.append(itLeft.value());
+        }
+    }
+    return reportErrors;
+}
+
+void DataVerificationAep::checkFiles(const QFileInfoList &inFiles)
+{
+    for(auto& file : inFiles) {
 
         if(readFile(file.absoluteFilePath())) {
-            loadErrors[0].first.append("Повреждённые файлы: ");
-            loadErrors[0].second.append(file.absoluteFilePath());
+            m_loadErrors.insert("Повреждённые файлы: ",
+                              file.absoluteFilePath());
             continue;
         }
 
         if(isDigitals(m_buffer)) {
-            loadErrors[1].first.append("В файлах имеются буквы: ");
-            loadErrors[1].second.append(file.absoluteFilePath());
+            m_loadErrors.insert("В файлах имеются буквы: ",
+                              file.absoluteFilePath());
         }
 
         if(isModes(file.absoluteFilePath())) {
-            loadErrors[2].first.append("В имени файла отсутствует вкл/выкл: ");
-            loadErrors[2].second.append(file.absoluteFilePath());
+            m_loadErrors.insert("В имени файла отсутствует вкл/выкл: ",
+                              file.absoluteFilePath());
         }
 
         if(isCountLineFile(m_buffer)) {
-            loadErrors[3].first.append("В файлах имеется превышение количества строк: ");
-            loadErrors[3].second.append(file.absoluteFilePath());
+            m_loadErrors.insert("В файлах имеется превышение количества строк: ",
+                              file.absoluteFilePath());
         }
 
         if(isCountTab(m_buffer)) {
-            loadErrors[4].first.append("В файлах имеется превышение количества табуляции: ");
-            loadErrors[4].second.append(file.absoluteFilePath());
+            m_loadErrors.insert("В файлах имеется превышение количества табуляции: ",
+                              file.absoluteFilePath());
         }
 
         if(compareResistance(m_buffer)) {
-            loadErrors[5].first.append("Файлы имеют разное сопротивление: ");
-            loadErrors[5].second.append(file.absoluteFilePath());
+            m_loadErrors.insert("Файлы имеют разное сопротивление: ",
+                              file.absoluteFilePath());
         }
     }
 
-    if(isEvenFiles(m_checkFiles)) {
-        loadErrors[6].first.append("Комплекты имеют не чётное количество файлов: ");
-        loadErrors[6].second.append(m_checkFiles.at(0).absoluteFilePath());
+    if(isEvenFiles(inFiles)) {
+        m_loadErrors.insert("Комплекты имеют не чётное количество файлов: ",
+                          inFiles.at(0).absoluteFilePath());
     }
-return reportErrors;
 }
 
 //-------------------------------------
@@ -88,7 +102,8 @@ return false;
 
 bool DataVerificationAep::isDigitals(const QString& inBuffer) const
 {
-    QRegularExpression re("^[\\s0-9.-]+$", QRegularExpression::CaseInsensitiveOption);
+    QRegularExpression re("^[\\s0-9.-]+$",
+                          QRegularExpression::CaseInsensitiveOption);
     QRegularExpressionMatch match = re.match(inBuffer);
     if (!match.hasMatch()) {
         return true;
@@ -108,7 +123,6 @@ return true;
 
 bool DataVerificationAep::isEvenFiles(const QFileInfoList& inFiles) const
 {
-    int a = inFiles.count() % 2;
     return inFiles.count() % 2 == 0 ? false : true;
 }
 
@@ -139,4 +153,5 @@ bool DataVerificationAep::compareResistance(QStringView inStr) const
         m_mapStr.erase(itMap);
         return tempBuffOneStr;
     }*/
+    return false;
 }

@@ -12,8 +12,8 @@ class DataVerificationAep
 public:
     DataVerificationAep();
 
-    void pushData(const QFileInfoList& inFiles);
-    QStringList checkFiles();
+    QStringList getData();
+    void checkFiles(const QFileInfoList &inFiles);
 
     DataVerificationAep (const DataVerificationAep& lhs) = delete;
     DataVerificationAep& operator=(const DataVerificationAep& lhs) = delete;
@@ -30,7 +30,7 @@ private:
     bool readFile(const QString& inPathFile) const;
 
 private:
-    QFileInfoList m_checkFiles;
+    QMultiMap<QString, QString> m_loadErrors;
     mutable QString m_buffer;
 };
 

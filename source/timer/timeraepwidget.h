@@ -42,6 +42,8 @@ signals:
 private:
     Ui::TimerAepWidget* ui = nullptr;
     LoggerWidget* m_logger = nullptr;
+
+    QStringList m_reportError;
 };
 
 #endif // TIMERAEPWIDGET_H

@@ -177,20 +177,25 @@ void TimerAepWidget::m_progress_prb_tempStart()
 void TimerAepWidget::m_report_pb_clicked()
 {
     this->hide();
+    m_logger->setError(m_reportError);
     m_logger->show();
 }
 
 void TimerAepWidget::m_startCheckData_pb_clicked()
 {
-    QStringList reportError;
     DataVerificationAep dv;
     Set& setsTree = getSetsInTree();
     ui->m_status_prb->setMaximum(setsTree.getSetsAep().count());
     for(auto& set: setsTree.getSetsAep()) {
-        dv.pushData(set.second);
-        reportError.append(dv.checkFiles());
+        dv.checkFiles(set.second);        
         emit emitStatus_prb();
     }
+
+    m_reportError = dv.getData();
+    if(m_reportError.isEmpty())
+        ui->m_report_pb->setStyleSheet("background-color: green;");
+    else
+        ui->m_report_pb->setStyleSheet("background-color: red;");
 }
 
 /**

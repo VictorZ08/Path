@@ -18,9 +18,20 @@ LoggerWidget::~LoggerWidget()
     qDebug()<<"~LoggerWidget";
 }
 
-void LoggerWidget::initEventFiter()
+void LoggerWidget::setError(const QStringList& inErrors)
 {
-    ui->m_reportError_lv->installEventFilter(this);
+    ui->m_reportError_te->clear();
+    ui->m_reportError_te->setTextColor(QColor("black"));
+
+    QStringList::const_iterator it = inErrors.begin();
+    for(; it != inErrors.end(); ++it) {
+        ui->m_reportError_te->insertPlainText(*it+"\n");
+    }
+}
+
+void LoggerWidget::initEventFilter()
+{
+    ui->m_reportError_te->installEventFilter(this);
 }
 
 /**
