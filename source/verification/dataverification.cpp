@@ -44,6 +44,7 @@ QStringList DataVerificationAep::getData()
 
 void DataVerificationAep::checkFiles(const QFileInfoList &inFiles)
 {
+    m_resistance.clear();
     for(auto& file : inFiles) {
 
         if(readFile(file.absoluteFilePath())) {
@@ -72,10 +73,12 @@ void DataVerificationAep::checkFiles(const QFileInfoList &inFiles)
                               file.absoluteFilePath());
         }
 
-        if(compareResistance(m_buffer)) {
-            m_loadErrors.insert("Файлы имеют разное сопротивление: ",
-                              file.absoluteFilePath());
-        }
+        fetchOneString(m_buffer);
+    }
+
+    if(isCompareResistance()) {
+        m_loadErrors.insert("Файлы имеют разное сопротивление: ",
+                          inFiles.at(0).absoluteFilePath());
     }
 
     if(isEvenFiles(inFiles)) {
@@ -138,20 +141,23 @@ bool DataVerificationAep::isCountTab(const QString& inBuffer) const
     return res == limitCountTab ? false : true;
 }
 
-bool DataVerificationAep::compareResistance(QStringView inStr) const
+bool DataVerificationAep::isCompareResistance()
 {
-    /*QString tempBuffOneStr = inBuff.left(inBuff.indexOf('\n', 1)).toString();
-
-    QMap<QString, QString>::iterator itMap = m_mapStr.find(tempBuffOneStr);
-    if(!m_mapStr.contains(tempBuffOneStr)) {
-        m_mapStr.insert(tempBuffOneStr,
-                        QString::number(Random::randOneStringAep(tempBuffOneStr.toDouble())));
-        return m_mapStr.value(tempBuffOneStr);
+    std::sort(m_resistance.begin(), m_resistance.end());
+    for(auto i = m_resistance.begin(); i != m_resistance.end(); ) {
+        if( *i == *(i + 1) )
+            i = m_resistance.erase( i, i + 2);
+        else
+            ++i;
     }
-    else {
-        tempBuffOneStr = m_mapStr.value(tempBuffOneStr);
-        m_mapStr.erase(itMap);
-        return tempBuffOneStr;
-    }*/
-    return false;
+
+    if(!m_resistance.isEmpty())
+        return true;
+
+return false;
+}
+
+void DataVerificationAep::fetchOneString(QStringView inStr)
+{
+    m_resistance.append(inStr.left(inStr.indexOf('\n', 1)).toString());
 }

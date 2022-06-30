@@ -228,9 +228,9 @@ void GeneratorAepWidget::m_startCheckData_pb_clicked()
 
     m_reportError = dv.getData();
     if(m_reportError.isEmpty())
-        ui->m_report_pb->setStyleSheet("background-color: green;");
+        ui->m_reportCheck_pb->setStyleSheet("background-color: green;");
     else
-        ui->m_report_pb->setStyleSheet("background-color: red;");
+        ui->m_reportCheck_pb->setStyleSheet("background-color: red;");
 }
 
 /**
