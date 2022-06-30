@@ -8,8 +8,6 @@
 
 #include <QDebug>
 
-static double m_step = 0.0;
-
 //-------------------------------
 TimerAepWidget::TimerAepWidget(SystemTray* inSysTray,
                                QWidget* inParent)
@@ -71,7 +69,7 @@ void TimerAepWidget::connectSlots() const
             this, SLOT(m_previewTime_le_changed()));
 
     connect(ui->m_report_pb, SIGNAL(clicked(bool)),
-            this, SLOT(m_report_pb_clicked()));
+            this, SLOT(m_reportCheck_pb_clicked()));
 
     connect(ui->m_startCheckData_pb, SIGNAL(clicked(bool)),
             this, SLOT(m_startCheckData_pb_clicked()));
@@ -159,8 +157,6 @@ void TimerAepWidget::m_start_pb_clicked()
             setDateTimeFiles(files, *itDateTime++);
         }
     }
-    statusGeneratesFiles("color: rgb(255, 255, 255)",
-                         "Статус: Готов");
 }
 
 /**
@@ -173,7 +169,7 @@ void TimerAepWidget::m_progress_prb_tempStart()
     ui->m_status_prb->setValue(m_step);
 }
 
-void TimerAepWidget::m_report_pb_clicked()
+void TimerAepWidget::m_reportCheck_pb_clicked()
 {
     this->hide();
     m_logger->setError(m_reportError);

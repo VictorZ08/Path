@@ -22,6 +22,7 @@ public:
                      QFileInfoList& inSetsInTree);
 
 protected:
+    void initEventFilter();
     void outputNameFile(QFileInfo& inNameFolderOut,
                         QFileInfoList::ConstIterator it);
     void outputDataFile(QFileInfo& inNameFolderOut,
