@@ -24,29 +24,19 @@ protected:
     bool isEvenFiles(const QFileInfoList& inFiles) const;
     bool isCountLineFile(const QString& inBuffer) const;
     bool isCountTab(const QString& inBuffer) const;
-    bool compareResistance(QStringView inStr) const;
+    bool isCompareResistance();
+
+    void fetchOneString(QStringView inStr);
 
 private:
     bool readFile(const QString& inPathFile) const;
 
 private:
     QMultiMap<QString, QString> m_loadErrors;
+    QList<QString> m_resistance;
+
     mutable QString m_buffer;
 };
 
 #endif // DATAVERIFICATION
-
-/*
- * АЭП:
- *1.Проверка на символы
- *2.Проверка на 00.00(2 символа после точки)
- *3.Проверка на .00 и 00. (символы до точки и после)
- *4.Проверка на конец строки после последнего значения
- *5.Проверка на четность файлов//
- *6.Проверка названия файлов на присутствие реимов ("выкл" и "вкл")//
- *7.Проверка одинаковых сопротивлений в 2х реж.//
- *
- *ПЭМИ:
- *
-*/
 
