@@ -1,6 +1,8 @@
 #include "ui_generatoraepwidget.h"
 #include "generatoraepwidget.h"
 #include "report/reportaepwidget.h"
+#include "verification/loggerwidget.h"
+#include "verification/dataverification.h"
 
 #include "sortfiles.h"
 #include "random/random.h"
@@ -17,6 +19,7 @@ GeneratorAepWidget::GeneratorAepWidget(SystemTray* inSysTray,
             : TimerInterface(inSysTray, inParent)
             , ui(new Ui::GeneratorAepWidget)
             , m_reportAep(new ReportAepWidget(inSysTray, this))
+            , m_logger(new LoggerWidget(inSysTray, this))
 {
     ui->setupUi(this);
 
@@ -31,8 +34,11 @@ GeneratorAepWidget::GeneratorAepWidget(SystemTray* inSysTray,
     setAcceptDrops(true);
 
     ui->m_loadSets_tw->setAttribute(Qt::WA_AcceptDrops, true);
-    statusGeneratesFiles("color: rgb(0, 0, 0)",
-                         "Статус:-");
+    ui->m_timeSet_le->setText(QString::number(kTimeSetAep));
+    ui->m_minTimeModes_le->setText(QString::number(kMinTimeModeAep));
+    ui->m_maxTimeModes_le->setText(QString::number(kMaxTimeModeAep));
+
+    ui->m_status_prb->setValue(0);
 
     qDebug()<<"Create GeneratorAepWidget";
 }
@@ -65,6 +71,9 @@ void GeneratorAepWidget::connectSlots() const
     connect(ui->m_report_pb, SIGNAL(clicked(bool)),
             this, SLOT(m_report_pb_clicked()));
 
+    connect(m_reportAep, SIGNAL(emitBackUi()),
+            this, SLOT(showForm()));
+
     connect(ui->m_timeSet_le, SIGNAL(textChanged(const QString& )),
             this, SLOT(m_previewTime_le_changed()));
 
@@ -77,11 +86,29 @@ void GeneratorAepWidget::connectSlots() const
     connect(ui->m_amplituda_dsb, SIGNAL(valueChanged(double)),
             this, SLOT(m_amplituda_dsb_changed()));
 
-    connect(m_reportAep, SIGNAL(emitBackUi()),
-            this, SLOT(showForm()));
-
     connect(this, SIGNAL(emitPreviewTime()),
             this, SLOT(m_previewTime_le_changed()));
+
+    connect(ui->m_minTimeModes_le, SIGNAL(textChanged(const QString &)),
+            this, SLOT(m_previewTime_le_changed()));
+
+    connect(ui->m_maxTimeModes_le, SIGNAL(textChanged(const QString &)),
+            this, SLOT(m_previewTime_le_changed()));
+
+    connect(ui->m_fixedTime_ckb, SIGNAL(stateChanged(int)),
+            this, SLOT(m_previewTime_le_changed()));
+
+    connect(ui->m_reportCheck_pb, SIGNAL(clicked(bool)),
+            this, SLOT(m_reportCheck_pb_clicked()));
+
+    connect(ui->m_startCheckData_pb, SIGNAL(clicked(bool)),
+            this, SLOT(m_startCheckData_pb_clicked()));
+
+    connect(this, SIGNAL(emitStatus_prb()), this,
+            SLOT(m_progress_prb_tempStart()), Qt::DirectConnection);
+
+    connect(m_logger, SIGNAL(emitBackUi()),
+            this, SLOT(showForm()));
 }
 
 /**
@@ -100,7 +127,6 @@ void GeneratorAepWidget::initEventFiter()
     ui->m_start_pb->installEventFilter(this);
     ui->m_amplituda_dsb->installEventFilter(this);
     ui->m_back_pb->installEventFilter(this);
-    ui->m_report_pb->installEventFilter(this);
 }
 
 /**
@@ -131,8 +157,10 @@ void GeneratorAepWidget::m_clear_pb_clicked()
     m_outPathFiles.clear();
     ui->m_saveSets_le->clear();
     ui->m_numSets_le->clear();
-    statusGeneratesFiles("color: rgb(0, 0, 0)",
-                         "Статус:-");
+    ui->m_timeSet_le->setText(QString::number(kTimeSetAep));
+    ui->m_minTimeModes_le->setText(QString::number(kMinTimeModeAep));
+    ui->m_maxTimeModes_le->setText(QString::number(kMaxTimeModeAep));
+    ui->m_status_prb->setValue(0);
 }
 
 /**
@@ -171,11 +199,38 @@ void GeneratorAepWidget::m_start_pb_clicked()
     shuffleFiles(setsInTree.getSetsAep());
 
     QVector<QDateTime>::iterator itDT = getDateTime().begin();
-    for(auto& pathFile : m_outPathFiles)
+    for(auto& pathFile : m_outPathFiles) {
         setDateTimeFiles(pathFile, *itDT++);
+        emit emitStatus_prb();
+    }
+}
 
-    statusGeneratesFiles("color: rgb(255, 255, 255)", "Статус: Готов");
+void GeneratorAepWidget::m_reportCheck_pb_clicked()
+{
+    this->hide();
+    m_logger->setError(m_reportError);
+    m_logger->show();
+}
 
+void GeneratorAepWidget::m_startCheckData_pb_clicked()
+{
+    if(getStatusLoadTree() == true)
+        return;
+
+    m_step = 0;
+    DataVerificationAep dv;
+    Set& setsTree = getSetsInTree();
+    ui->m_status_prb->setMaximum(setsTree.getSetsAep().count());
+    for(auto& set: setsTree.getSetsAep()) {
+        dv.checkFiles(set.second);
+        emit emitStatus_prb();
+    }
+
+    m_reportError = dv.getData();
+    if(m_reportError.isEmpty())
+        ui->m_report_pb->setStyleSheet("background-color: green;");
+    else
+        ui->m_report_pb->setStyleSheet("background-color: red;");
 }
 
 /**
@@ -365,6 +420,16 @@ void GeneratorAepWidget::m_amplituda_dsb_changed()
     m_valAmplituda = ui->m_amplituda_dsb->value();
     ui->label_ampl_res->setText(tr("Размах: %1").arg(m_valAmplituda*2));
     ui->labelAmplituda->setText(tr("от -%1 до +%1").arg(m_valAmplituda));
+}
+
+/**
+    @brief GeneratorAepWidget::m_progress_prb_tempStart
+    Увеличивает состояние прогрессбар
+*/
+void GeneratorAepWidget::m_progress_prb_tempStart()
+{
+    ++m_step;
+    ui->m_status_prb->setValue(m_step);
 }
 
 /**

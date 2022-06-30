@@ -20,6 +20,8 @@ ReportAepWidget::ReportAepWidget(SystemTray* inSysTray,
 {
     ui->setupUi(this);
 
+    initEventFilter();
+
     QDesktopWidget desk;
     QRect QScreen = desk.availableGeometry();
     setFixedSize(750, QScreen.height()-70);
@@ -37,6 +39,16 @@ ReportAepWidget::~ReportAepWidget()
 {
     delete ui;
     qDebug()<<"~Report";
+}
+
+/**
+    @brief ReportAepWidget::initEventFiter
+    Установка эвент фильтра, что бы при нажатии на пробел
+    (приложение сворачивается в tree), фокус не смещался на виджеты
+*/
+void ReportAepWidget::initEventFilter()
+{
+    ui->m_outTextInfo_te->installEventFilter(this);
 }
 
 /**

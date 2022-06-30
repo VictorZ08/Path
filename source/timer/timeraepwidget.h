@@ -29,7 +29,7 @@ protected slots:
     void m_clear_pb_clicked();
     void m_back_pb_clicked();
     void m_start_pb_clicked();
-    void m_report_pb_clicked();
+    void m_reportCheck_pb_clicked();
     void m_startCheckData_pb_clicked();
     void m_previewTime_le_changed();
     void m_progress_prb_tempStart();

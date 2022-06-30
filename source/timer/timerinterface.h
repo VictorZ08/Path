@@ -51,6 +51,7 @@ protected:
     static constexpr int kMinTimeModeAep = 5;
     static constexpr int kMaxTimeModeAep = 8;
     static constexpr int kTimeSetPemi = 50;
+    double m_step = 0.0;
 
 signals:
     void emitPreviewTime();
