@@ -32,8 +32,6 @@ protected:
     void clearWiget();
     void initCurrentTimeWidget();
     void setParentWiget(const QObject* inObj);
-    void statusGeneratesFiles(const QString& inColor,
-                              const QString& inStatus);
     void dragEventTreeWidget(QEvent* inEvent);
     void dropEventTreeWidget();
 

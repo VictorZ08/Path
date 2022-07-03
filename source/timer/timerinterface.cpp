@@ -235,20 +235,6 @@ void TimerInterface::clearWiget()
 }
 
 /**
-    @brief TimerInterface::statusGeneratesFiles
-    Выводит строку стату начала или
-    завершения работы генерации файлов
-    @param inColor Цвет текста
-    @param inStatus Текст
-*/
-void TimerInterface::statusGeneratesFiles(const QString& inColor,
-                                          const QString& inStatus)
-{
-    /*m_status_l->setStyleSheet(inColor);
-    m_status_l->setText(inStatus);*/
-}
-
-/**
     @brief TimerInterface::countSetsInTree
     Выводит количество комплектов в tw
 */

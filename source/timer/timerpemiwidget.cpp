@@ -19,9 +19,6 @@ TimerPemiWidget::TimerPemiWidget(SystemTray* inSysTray,
     initEventFiter();
 
     ui->m_loadSets_tw->setAttribute(Qt::WA_AcceptDrops, true);
-    statusGeneratesFiles("color: rgb(0, 0, 0)",
-                         "Статус:-");
-
     qDebug()<<"Create TimerPemiWidget";
 }
 
@@ -80,7 +77,6 @@ void TimerPemiWidget::initEventFiter()
 void TimerPemiWidget::m_clear_pb_clicked()
 {
     clearWiget();
-    statusGeneratesFiles("color: rgb(0, 0, 0)", "Статус:-");
 }
 
 /**
@@ -115,8 +111,6 @@ void TimerPemiWidget::m_start_pb_clicked()
     for(auto& set : sets.getSetsPemi()) {
         setDateTimeFiles(set, *itDT++);
     }
-    statusGeneratesFiles("color: rgb(255, 255, 255)",
-                         "Статус: Готов");
 }
 
 /**
