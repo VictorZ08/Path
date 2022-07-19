@@ -5,7 +5,7 @@
 #include <QMap>
 
 class ReportAepWidget;
-class LoggerWidget;
+//class LoggerWidget;
 
 QT_BEGIN_NAMESPACE
 namespace Ui {class GeneratorAepWidget; }
@@ -20,7 +20,7 @@ class GeneratorAepWidget final : public TimerInterface
 
 public:
     explicit GeneratorAepWidget(SystemTray* inSysTray = nullptr,
-                               QWidget* inParent = nullptr);
+                                QWidget* inParent = nullptr);
     ~GeneratorAepWidget();
 
 protected:
@@ -40,27 +40,24 @@ protected slots:
     void m_clear_pb_clicked();
     void m_back_pb_clicked();
     void m_start_pb_clicked();
-    void m_reportCheck_pb_clicked();/////
-    void m_startCheckData_pb_clicked();////
+    void m_reportCheck_pb_clicked();
+    void m_startCheckData_pb_clicked();
     void m_report_pb_clicked();
     void m_previewTime_le_changed();
     void m_amplituda_dsb_changed();
-    void m_progress_prb_tempStart();//////
+    void m_progress_prb_tempStart();
     void showForm();
 
 signals:
     void emitBackUi();
-    void emitStatus_prb();///
 
 private:
     Ui::GeneratorAepWidget* ui   = nullptr;
     ReportAepWidget* m_reportAep = nullptr;
-    LoggerWidget* m_logger       = nullptr;////
+    LoggerWidget* m_logger       = nullptr;
 
     QMap<QString, QString>  m_mapStr;
     QFileInfoList           m_outPathFiles;
-
-    QStringList m_reportError;/////
 
     double m_valAmplituda = 0.5;
 };

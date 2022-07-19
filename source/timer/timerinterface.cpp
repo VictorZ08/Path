@@ -4,6 +4,7 @@
 #include "random/random.h"
 #include "timer.h"
 #include "modes/systemtray.h"
+#include "verification/loggerwidget.h"
 #include "verification/dataverification.h"
 
 #include <QMimeData>
@@ -13,6 +14,8 @@
 #include <QLineEdit>
 #include <QCheckBox>
 #include <QDateTimeEdit>
+#include <QProgressBar>
+#include <QPushButton>
 #include <QLabel>
 #include <QDir>
 
@@ -207,7 +210,10 @@ void TimerInterface::setParentWiget(const QObject* inObj)
     m_numSets_le = inObj->findChild<QLineEdit *>("m_numSets_le");
     m_saveSets_le = inObj->findChild<QLineEdit *>("m_saveSets_le");
     m_editTime_dte = inObj->findChild<QDateTimeEdit *>("m_editTime_dte");
-    m_fixedTime_ckb = inObj->findChild<QCheckBox *>("m_fixedTime_ckb");
+    m_fixedTime_ckb = inObj->findChild<QCheckBox *>("m_fixedTime_ckb");    
+    m_startCheckData_pb = inObj->findChild<QPushButton *>("m_startCheckData_pb");
+    m_reportCheck_pb = inObj->findChild<QPushButton *>("m_reportCheck_pb");
+    m_status_prb = inObj->findChild<QProgressBar *>("m_status_prb");
 
     initCurrentTimeWidget();
 }
@@ -246,6 +252,53 @@ size_t TimerInterface::getCountSetsInTree()
     }
     else
         return m_loadSetsTree.countSetsAep();
+}
+
+/**
+    @brief TimerInterface::progressTempStart
+    Увеличивает состояние прогрессбар
+*/
+void TimerInterface::progressTempStart()
+{
+    ++m_step;
+    m_status_prb->setValue(m_step);
+}
+
+/**
+    @brief TimerInterface::reportCheck
+    Вывод отчета
+    @param logger получаем указатель на виджет форму
+*/
+void TimerInterface::reportCheck(LoggerWidget* logger)
+{
+    this->hide();
+    logger->setError(m_reportError);
+    logger->show();
+}
+
+/**
+    @brief TimerInterface::startCheckData
+    Проверка данных в tree на ошибки
+*/
+void TimerInterface::startCheckData()
+{
+    if(getStatusLoadTree() == true)
+        return;
+
+    m_step = 0;
+    DataVerificationAep dv;
+    Set& setsTree = getSetsInTree();
+    m_status_prb->setMaximum(setsTree.getSetsAep().count());
+    for(auto& set: setsTree.getSetsAep()) {
+        dv.checkFiles(set.second);
+        emit emitStatus_prb();
+    }
+
+    m_reportError = dv.getData();
+    if(m_reportError.isEmpty())
+        m_reportCheck_pb->setStyleSheet("background-color: green;");
+    else
+        m_reportCheck_pb->setStyleSheet("background-color: red;");
 }
 
 /**

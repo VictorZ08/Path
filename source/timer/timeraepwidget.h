@@ -37,13 +37,10 @@ protected slots:
 
 signals:
     void emitBackUi();
-    void emitStatus_prb();
 
 private:
     Ui::TimerAepWidget* ui = nullptr;
     LoggerWidget* m_logger = nullptr;
-
-    QStringList m_reportError;
 };
 
 #endif // TIMERAEPWIDGET_H

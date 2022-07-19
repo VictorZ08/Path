@@ -8,11 +8,13 @@
 
 class QTreeWidget;
 class QDateTimeEdit;
+class QProgressBar;
 class QLineEdit;
 class QLabel;
 class QCheckBox;
 class SystemTray;
 class Set;
+class LoggerWidget;
 
 /**
     @author Victor Zaytcev
@@ -34,6 +36,9 @@ protected:
     void setParentWiget(const QObject* inObj);
     void dragEventTreeWidget(QEvent* inEvent);
     void dropEventTreeWidget();
+    void progressTempStart();
+    void reportCheck(LoggerWidget* logge);
+    void startCheckData();
 
     size_t getCountSetsInTree();
     QVector<QDateTime>& getDateTime() { return m_dateTime;};
@@ -53,6 +58,7 @@ protected:
 
 signals:
     void emitPreviewTime();
+    void emitStatus_prb();
 
 private:
     QTreeWidget* m_loadSets_tw    = nullptr;
@@ -64,14 +70,18 @@ private:
     QLineEdit* m_numSets_le       = nullptr;
     QLineEdit* m_saveSets_le      = nullptr;
     QLabel* m_status_l            = nullptr;
-    QCheckBox* m_fixedTime_ckb     = nullptr;
+    QCheckBox* m_fixedTime_ckb    = nullptr;
     SystemTray* m_sysTray         = nullptr;
+    QProgressBar* m_status_prb    = nullptr;
+    QPushButton* m_startCheckData_pb = nullptr;
+    QPushButton* m_reportCheck_pb    = nullptr;
 
     QVector<QDateTime>  m_dateTime;
     QDateTime           m_beginWorkTime;
     Set                 m_loadSetsTree;
     Set                 m_tempBufferLoadData;//?????
 
+    QStringList m_reportError;
     bool m_checkStatusLoadTree = true;
 };
 
