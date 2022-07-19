@@ -36,8 +36,6 @@ GeneratorPemiWidget::GeneratorPemiWidget(SystemTray* inSysTray,
     setAcceptDrops(true);
 
     ui->m_loadSets_tw->setAttribute(Qt::WA_AcceptDrops, true);
-    statusGeneratesFiles("color: rgb(0, 0, 0)",
-                         "Статус:-");
     qDebug()<<"Create GeneratorPemiWidget";
 }
 
@@ -163,7 +161,7 @@ void GeneratorPemiWidget::initSpinBoxAmplituda()
     ui->m_amplituda_sb->setDecimals(1);
     ui->m_amplituda_sb->setRange(0.5, 5);
     ui->label_ampl_res->setText(tr("Размах: %1").arg(m_valAmplituda*2));
-    ui->label_amplituda->setText(tr("от -%1 до +%1").arg(m_valAmplituda));
+    ui->labelAmplituda->setText(tr("от -%1 до +%1").arg(m_valAmplituda));
     ui->m_amplituda_sb->setSingleStep(0.5);
     ui->m_amplituda_sb->setWrapping(true);
 }
@@ -180,8 +178,6 @@ void GeneratorPemiWidget::m_clear_pb_clicked()
     ui->m_saveSets_le->clear();
 
     m_outExelFiles.clear();
-    statusGeneratesFiles("color: rgb(0, 0, 0)",
-                         "Статус:-");
 }
 
 /**
@@ -272,7 +268,7 @@ void GeneratorPemiWidget::m_amplituda_sb_textChanged()
 {
     m_valAmplituda = ui->m_amplituda_sb->value();
     ui->label_ampl_res->setText(tr("Размах: %1").arg(m_valAmplituda*2));
-    ui->label_amplituda->setText(tr("от -%1 до +%1").arg(m_valAmplituda));
+    ui->labelAmplituda->setText(tr("от -%1 до +%1").arg(m_valAmplituda));
 }
 
 /**
@@ -336,9 +332,6 @@ void GeneratorPemiWidget::m_start_pb_clicked()
     }
     //Создаем файл и записываем в него s/n комплектов
     writeSNsetsInTxtFile(saveSets, "s-n", dataSets);
-
-    ui->m_status_l->setStyleSheet("color: rgb(255, 255, 255)");
-    ui->m_status_l->setText("Статус: Завершено!!!");
 }
 
 /**

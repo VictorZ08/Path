@@ -143,12 +143,15 @@ bool DataVerificationAep::isCountTab(const QString& inBuffer) const
 
 bool DataVerificationAep::isCompareResistance()
 {
-    std::sort(m_resistance.begin(), m_resistance.end());
-    for(auto i = m_resistance.begin(); i != m_resistance.end(); ) {
-        if( *i == *(i + 1) )
-            i = m_resistance.erase( i, i + 2);
-        else
-            ++i;
+    m_resistance.sort();
+    QList<QString>::Iterator it;
+    for(it = m_resistance.begin(); it != m_resistance.end(); ) {
+        it = std::adjacent_find(it, m_resistance.end());
+        if(it == m_resistance.end()) {
+            break;
+        }
+        m_resistance.erase( it, it + 2);
+        it = m_resistance.begin();
     }
 
     if(!m_resistance.isEmpty())
@@ -159,5 +162,10 @@ return false;
 
 void DataVerificationAep::fetchOneString(QStringView inStr)
 {
-    m_resistance.append(inStr.left(inStr.indexOf('\n', 1)).toString());
+    qsizetype size = inStr.indexOf('\n', 1);
+    if(size == -1) {
+        m_resistance.append("-");
+        return;
+    }
+    m_resistance.append(inStr.left(size).toString());
 }

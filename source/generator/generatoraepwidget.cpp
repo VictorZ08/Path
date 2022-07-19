@@ -2,7 +2,6 @@
 #include "generatoraepwidget.h"
 #include "report/reportaepwidget.h"
 #include "verification/loggerwidget.h"
-#include "verification/dataverification.h"
 
 #include "sortfiles.h"
 #include "random/random.h"
@@ -126,7 +125,13 @@ void GeneratorAepWidget::initEventFiter()
     ui->m_editTime_dte->installEventFilter(this);
     ui->m_start_pb->installEventFilter(this);
     ui->m_amplituda_dsb->installEventFilter(this);
-    ui->m_back_pb->installEventFilter(this);
+    ui->m_back_pb->installEventFilter(this);    
+    ui->m_previewTime_le->setEnabled(false);
+    ui->m_startCheckData_pb->installEventFilter(this);
+    ui->m_reportCheck_pb->installEventFilter(this);
+    ui->m_minTimeModes_le->installEventFilter(this);
+    ui->m_maxTimeModes_le->installEventFilter(this);
+    ui->m_fixedTime_ckb->installEventFilter(this);
 }
 
 /**
@@ -205,32 +210,31 @@ void GeneratorAepWidget::m_start_pb_clicked()
     }
 }
 
-void GeneratorAepWidget::m_reportCheck_pb_clicked()
+/**
+    @brief GeneratorAepWidget::m_progress_prb_tempStart
+    Увеличивает состояние прогрессбар
+*/
+void GeneratorAepWidget::m_progress_prb_tempStart()
 {
-    this->hide();
-    m_logger->setError(m_reportError);
-    m_logger->show();
+    progressTempStart();
 }
 
+/**
+    @brief GeneratorAepWidget::m_reportCheck_pb_clicked
+    Вывод отчета
+*/
+void GeneratorAepWidget::m_reportCheck_pb_clicked()
+{
+    reportCheck(m_logger);
+}
+
+/**
+    @brief GeneratorAepWidget::m_startCheckData_pb_clicked
+    Проверка данных в tree на ошибки
+*/
 void GeneratorAepWidget::m_startCheckData_pb_clicked()
 {
-    if(getStatusLoadTree() == true)
-        return;
-
-    m_step = 0;
-    DataVerificationAep dv;
-    Set& setsTree = getSetsInTree();
-    ui->m_status_prb->setMaximum(setsTree.getSetsAep().count());
-    for(auto& set: setsTree.getSetsAep()) {
-        dv.checkFiles(set.second);
-        emit emitStatus_prb();
-    }
-
-    m_reportError = dv.getData();
-    if(m_reportError.isEmpty())
-        ui->m_reportCheck_pb->setStyleSheet("background-color: green;");
-    else
-        ui->m_reportCheck_pb->setStyleSheet("background-color: red;");
+    startCheckData();
 }
 
 /**
@@ -420,16 +424,6 @@ void GeneratorAepWidget::m_amplituda_dsb_changed()
     m_valAmplituda = ui->m_amplituda_dsb->value();
     ui->label_ampl_res->setText(tr("Размах: %1").arg(m_valAmplituda*2));
     ui->labelAmplituda->setText(tr("от -%1 до +%1").arg(m_valAmplituda));
-}
-
-/**
-    @brief GeneratorAepWidget::m_progress_prb_tempStart
-    Увеличивает состояние прогрессбар
-*/
-void GeneratorAepWidget::m_progress_prb_tempStart()
-{
-    ++m_step;
-    ui->m_status_prb->setValue(m_step);
 }
 
 /**
