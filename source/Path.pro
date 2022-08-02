@@ -1,7 +1,7 @@
-#include (C:/Users/Victor/Documents/Path/libs/QtXlsx/QtXlsxWriter-master/QtXlsxWriter-master/src/xlsx/qtxlsx.pri)
-
 QT       += core gui
 QT       += sql
+
+include (../libQtXlsx/src/xlsx/qtxlsx.pri)
 #QT       += concurrent
 #QMAKE_CXXFLAGS+=-Zi
 #QMAKE_LFLAGS+=/DEBUG
