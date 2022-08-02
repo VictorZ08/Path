@@ -1,3 +1,3 @@
-[submodule "lib QtXlsx"]
-	path = lib QtXlsx
+[submodule "libQtXlsx"]
+	path = libQtXlsx
 	url = https://github.com/dbzhang800/QtXlsxWriter.git
