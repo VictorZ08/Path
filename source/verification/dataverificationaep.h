@@ -1,9 +1,8 @@
-#ifndef DATAVERIFICATION
-#define DATAVERIFICATION
+#ifndef DATAVERIFICATIONAEP_H
+#define DATAVERIFICATIONAEP_H
 
-#include <QObject>
 #include <QFileInfoList>
-#include <QDebug>
+#include <QMultiMap>
 
 using  pairSLSL = QPair<QStringList, QStringList>;
 
@@ -12,11 +11,8 @@ class DataVerificationAep
 public:
     DataVerificationAep();
 
-    QStringList getData();
+    QStringList getLog();
     void checkFiles(const QFileInfoList &inFiles);
-
-    DataVerificationAep (const DataVerificationAep& lhs) = delete;
-    DataVerificationAep& operator=(const DataVerificationAep& lhs) = delete;
 
 protected:
     bool isDigitals(const QString& inBuffer) const;
@@ -36,6 +32,9 @@ private:
     QList<QString> m_resistance;
 
     mutable QString m_buffer;
+
+    DataVerificationAep (const DataVerificationAep& lhs) = delete;
+    DataVerificationAep& operator=(const DataVerificationAep& lhs) = delete;
 };
 
 #endif // DATAVERIFICATION

@@ -1,6 +1,7 @@
 #include "ui_generatorpemiwidget.h"
 #include "generator/generatorpemiwidget.h"
 #include "generator/table/tablesetswidget.h"
+#include "verification/loggerwidget.h"
 #include "random/random.h"
 #include "qrandom.h"
 #include "sortfiles.h"
@@ -15,6 +16,7 @@ GeneratorPemiWidget::GeneratorPemiWidget(SystemTray* inSysTray,
                 : TimerInterface(inSysTray, inParent)
                 , ui(new Ui::GeneratorPemiWidget)
                 , m_tableSetsWidget(new TableSetsWidget(inSysTray, this))
+                , m_logger(new LoggerWidget(inSysTray, this))
 {
     ui->setupUi(this);
 
@@ -31,7 +33,8 @@ GeneratorPemiWidget::GeneratorPemiWidget(SystemTray* inSysTray,
     setStyleSheet("QLineEdit[readOnly=\"true\"] {""color: #808080;"
                   "background-color: #F0F0F0;""border: 1px solid #B0B0B0;"
                   "border-radius: 2px;}");
-    ui->m_numSets_le->setText("0");
+    //ui->m_numSets_le->setText("0");
+    //ui->m_status_prb->setValue(0);
 
     setAcceptDrops(true);
 
@@ -116,6 +119,24 @@ void GeneratorPemiWidget::connectSlots() const
 
     connect(m_tableSetsWidget, SIGNAL(emitBackUi()),
             this, SLOT(showForm()));
+
+    connect(ui->m_fixedTime_ckb, SIGNAL(stateChanged(int)),
+            this, SLOT(m_previewTime_le_textChanged()));
+
+    connect(ui->m_startCheckData_pb, SIGNAL(clicked(bool)),
+            this, SLOT(m_startCheckData_pb_clicked()));
+
+    connect(ui->m_reportCheck_pb, SIGNAL(clicked(bool)),
+            this, SLOT(m_reportCheck_pb_clicked()));
+
+    connect(this, SIGNAL(emitPreviewTime()),
+            this, SLOT(m_previewTime_le_textChanged()));
+
+    connect(this, SIGNAL(emitStatus_prb()), this,
+            SLOT(m_progress_prb_tempStart()), Qt::DirectConnection);
+
+    connect(m_logger, SIGNAL(emitBackUi()),
+            this, SLOT(showForm()));
 }
 
 /**
@@ -176,8 +197,11 @@ void GeneratorPemiWidget::m_clear_pb_clicked()
 
     ui->m_loadSets_tw->clear();
     ui->m_saveSets_le->clear();
-
     m_outExelFiles.clear();
+    ui->m_saveSets_le->clear();
+    ui->m_numSets_le->clear();
+    ui->m_timeSet_le->setText(QString::number(kTimeSetAep));
+    ui->m_status_prb->setValue(0);
 }
 
 /**
@@ -188,6 +212,33 @@ void GeneratorPemiWidget::m_previewTime_le_textChanged()
 {
     if(ui->m_numSets_le->text() != "0")
         previewTime();
+}
+
+/**
+    @brief GeneratorPemiWidget::m_startCheckData_pb_clicked
+    Проверка данных в tree на ошибки
+*/
+void GeneratorPemiWidget::m_startCheckData_pb_clicked()
+{
+    startCheckData();
+}
+
+/**
+    @brief GeneratorPemiWidget::m_progress_prb_tempStart
+    Увеличивает состояние прогрессбар
+*/
+void GeneratorPemiWidget::m_progress_prb_tempStart()
+{
+    progressTempStart();
+}
+
+/**
+    @brief GeneratorPemiWidget::m_reportCheck_pb_clicked
+    Вывод отчета
+*/
+void GeneratorPemiWidget::m_reportCheck_pb_clicked()
+{
+    reportCheck(m_logger);
 }
 
 /**
@@ -287,6 +338,7 @@ void GeneratorPemiWidget::m_start_pb_clicked()
     QFileInfoList::iterator it = sets.begin();
     QString serialNumSet;
     QVector<QStringList> dataSets = m_tableSetsWidget->getTableValues();
+    ui->m_status_prb->setMaximum(dataSets.count() + m_outExelFiles.count()*2);
     for(auto& dataSet : dataSets) {
         if(dataSet.at(0) == "-")
             serialNumSet = dataSet.at(1);
@@ -298,13 +350,13 @@ void GeneratorPemiWidget::m_start_pb_clicked()
         if(it == sets.end()) {
             it = sets.begin();
         }
+        emit emitStatus_prb();
     }
     /************************************/
     /*Редактируем файлы exel*/
     QPoint posCell;
     QStringList exelSeetsNames;
     QVector<QStringList>::iterator itTableValues = m_tableSetsWidget->getTableValues().begin();//можно взять вначале метода
-
     sCoordSerchTable coord;
     for(auto& exelFile : m_outExelFiles) {
         QXlsx::Document xlsxOpenFile(exelFile.absoluteFilePath());
@@ -322,6 +374,7 @@ void GeneratorPemiWidget::m_start_pb_clicked()
         }
         xlsxOpenFile.save();
         ++itTableValues;
+        emit emitStatus_prb();
     }
     /************************************/
     //Присваиваем двту и время
@@ -329,6 +382,7 @@ void GeneratorPemiWidget::m_start_pb_clicked()
     shuffleFiles(m_outExelFiles);
     for(auto& exelFile : m_outExelFiles) {
         setDateTimeFiles(exelFile, *itDT++);
+        emit emitStatus_prb();
     }
     //Создаем файл и записываем в него s/n комплектов
     writeSNsetsInTxtFile(saveSets, "s-n", dataSets);

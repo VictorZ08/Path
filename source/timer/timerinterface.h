@@ -6,6 +6,8 @@
 #include <QDialog>
 #include <QDateTime>
 
+struct sCoordSerchTable;
+
 class QTreeWidget;
 class QDateTimeEdit;
 class QProgressBar;
@@ -37,7 +39,7 @@ protected:
     void dragEventTreeWidget(QEvent* inEvent);
     void dropEventTreeWidget();
     void progressTempStart();
-    void reportCheck(LoggerWidget* logge);
+    void reportCheck(LoggerWidget* logger);
     void startCheckData();
 
     size_t getCountSetsInTree();

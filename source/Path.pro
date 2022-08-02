@@ -2,7 +2,7 @@ include (C:/Users/Victor/Documents/Path/libs/QtXlsx/QtXlsxWriter-master/QtXlsxWr
 
 QT       += core gui
 QT       += sql
-QT       += concurrent
+#QT       += concurrent
 #QMAKE_CXXFLAGS+=-Zi
 #QMAKE_LFLAGS+=/DEBUG
 
@@ -36,7 +36,8 @@ SOURCES += \
     timer/timerinterface.cpp \
     timer/timerpemiwidget.cpp \
     treeitem.cpp \
-    verification/dataverification.cpp \
+    verification/dataverificationaep.cpp \
+    verification/dataverificationpemi.cpp \
     verification/loggerwidget.cpp
 
 
@@ -63,7 +64,8 @@ HEADERS += \
     timer/timerinterface.h \
     timer/timerpemiwidget.h \
     treeitem.h \
-    verification/dataverification.h \
+    verification/dataverificationaep.h \
+    verification/dataverificationpemi.h \
     verification/loggerwidget.h
 
 
@@ -88,4 +90,6 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 RESOURCES += \
     path.qrc \
 
-DISTFILES +=
+DISTFILES += \
+    диаграмма.qmodel \
+    диаграмма.qmodel \

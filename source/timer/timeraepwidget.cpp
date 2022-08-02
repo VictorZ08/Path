@@ -21,11 +21,6 @@ TimerAepWidget::TimerAepWidget(SystemTray* inSysTray,
     initEventFiter();
 
     ui->m_loadSets_tw->setAttribute(Qt::WA_AcceptDrops, true);
-    ui->m_timeSet_le->setText(QString::number(kTimeSetAep));
-    ui->m_minTimeModes_le->setText(QString::number(kMinTimeModeAep));
-    ui->m_maxTimeModes_le->setText(QString::number(kMaxTimeModeAep));
-
-    ui->m_status_prb->setValue(0);
 
     qDebug()<<"Create TimerAepWidget";
 }
@@ -111,6 +106,7 @@ void TimerAepWidget::initEventFiter()
 void TimerAepWidget::m_clear_pb_clicked()
 {
     clearWiget();
+
     ui->m_timeSet_le->setText(QString::number(kTimeSetAep));
     ui->m_minTimeModes_le->setText(QString::number(kMinTimeModeAep));
     ui->m_maxTimeModes_le->setText(QString::number(kMaxTimeModeAep));

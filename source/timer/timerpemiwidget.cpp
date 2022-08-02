@@ -1,5 +1,6 @@
 #include "ui_timerpemiwidget.h"
 #include "timerpemiwidget.h"
+#include "verification/loggerwidget.h"
 
 #include "sortfiles.h"
 #include "timer.h"
@@ -11,6 +12,7 @@ TimerPemiWidget::TimerPemiWidget(SystemTray* inSysTray,
                                  QWidget* inParent)
             : TimerInterface(inSysTray, inParent)
             , ui{new Ui::TimerPemiWidget}
+            , m_logger(new LoggerWidget(inSysTray, this))
 {
     ui->setupUi(this);
 
@@ -52,6 +54,21 @@ void TimerPemiWidget::connectSlots() const
 
     connect(this, SIGNAL(emitPreviewTime()),
             this, SLOT(m_previewTime_le_changed()));
+
+    connect(ui->m_fixedTime_ckb, SIGNAL(stateChanged(int)),
+            this, SLOT(m_previewTime_le_changed()));
+
+    connect(ui->m_startCheckData_pb, SIGNAL(clicked(bool)),
+            this, SLOT(m_startCheckData_pb_clicked()));
+
+    connect(ui->m_reportCheck_pb, SIGNAL(clicked(bool)),
+            this, SLOT(m_reportCheck_pb_clicked()));
+
+    connect(this, SIGNAL(emitStatus_prb()), this,
+            SLOT(m_progress_prb_tempStart()), Qt::DirectConnection);
+
+    connect(m_logger, SIGNAL(emitBackUi()),
+            this, SLOT(showForm()));
 }
 
 /**
@@ -77,6 +94,9 @@ void TimerPemiWidget::initEventFiter()
 void TimerPemiWidget::m_clear_pb_clicked()
 {
     clearWiget();
+
+    ui->m_timeSet_le->setText(QString::number(kTimeSetPemi));
+    ui->m_status_prb->setValue(0);
 }
 
 /**
@@ -86,6 +106,42 @@ void TimerPemiWidget::m_clear_pb_clicked()
 void TimerPemiWidget::m_previewTime_le_changed()
 {
     previewTime();
+}
+
+/**
+    @brief TimerPemiWidget::m_startCheckData_pb_clicked
+    Проверка данных в tree на ошибки
+*/
+void TimerPemiWidget::m_startCheckData_pb_clicked()
+{
+    startCheckData();
+}
+
+/**
+    @brief TimerPemiWidget::m_reportCheck_pb_clicked
+    Вывод отчета
+*/
+void TimerPemiWidget::m_reportCheck_pb_clicked()
+{
+    reportCheck(m_logger);
+}
+
+/**
+    @brief TimerPemiWidget::m_progress_prb_tempStart
+    Увеличивает состояние прогрессбар
+*/
+void TimerPemiWidget::m_progress_prb_tempStart()
+{
+    progressTempStart();
+}
+
+/**
+    @brief TimerPemiWidget::showForm
+    Вывод формы
+*/
+void TimerPemiWidget::showForm()
+{
+    this->show();
 }
 
 /**
@@ -104,12 +160,14 @@ void TimerPemiWidget::m_back_pb_clicked()
 */
 void TimerPemiWidget::m_start_pb_clicked()
 {
-    Set& sets = getSetsInTree();
+    Set& setsTree = getSetsInTree();
+    ui->m_status_prb->setMaximum(setsTree.getSetsPemi().count());
 
     QVector<QDateTime>::iterator itDT = getDateTime().begin();
-    shuffleFiles(sets.getSetsPemi());
-    for(auto& set : sets.getSetsPemi()) {
+    shuffleFiles(setsTree.getSetsPemi());
+    for(auto& set : setsTree.getSetsPemi()) {
         setDateTimeFiles(set, *itDT++);
+        emit emitStatus_prb();
     }
 }
 

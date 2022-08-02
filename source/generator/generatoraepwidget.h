@@ -5,7 +5,6 @@
 #include <QMap>
 
 class ReportAepWidget;
-//class LoggerWidget;
 
 QT_BEGIN_NAMESPACE
 namespace Ui {class GeneratorAepWidget; }

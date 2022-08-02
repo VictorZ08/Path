@@ -33,11 +33,6 @@ GeneratorAepWidget::GeneratorAepWidget(SystemTray* inSysTray,
     setAcceptDrops(true);
 
     ui->m_loadSets_tw->setAttribute(Qt::WA_AcceptDrops, true);
-    ui->m_timeSet_le->setText(QString::number(kTimeSetAep));
-    ui->m_minTimeModes_le->setText(QString::number(kMinTimeModeAep));
-    ui->m_maxTimeModes_le->setText(QString::number(kMaxTimeModeAep));
-
-    ui->m_status_prb->setValue(0);
 
     qDebug()<<"Create GeneratorAepWidget";
 }
@@ -73,13 +68,13 @@ void GeneratorAepWidget::connectSlots() const
     connect(m_reportAep, SIGNAL(emitBackUi()),
             this, SLOT(showForm()));
 
-    connect(ui->m_timeSet_le, SIGNAL(textChanged(const QString& )),
+    connect(ui->m_timeSet_le, SIGNAL(textChanged(const QString&)),
             this, SLOT(m_previewTime_le_changed()));
 
-    connect(ui->m_editTime_dte, SIGNAL(dateTimeChanged(const QDateTime& )),
+    connect(ui->m_editTime_dte, SIGNAL(dateTimeChanged(const QDateTime&)),
             this, SLOT(m_previewTime_le_changed()));
 
-    connect(ui->m_numSets_le, SIGNAL(textChanged(const QString& )),
+    connect(ui->m_numSets_le, SIGNAL(textChanged(const QString&)),
             this, SLOT(m_previewTime_le_changed()));
 
     connect(ui->m_amplituda_dsb, SIGNAL(valueChanged(double)),
@@ -88,10 +83,10 @@ void GeneratorAepWidget::connectSlots() const
     connect(this, SIGNAL(emitPreviewTime()),
             this, SLOT(m_previewTime_le_changed()));
 
-    connect(ui->m_minTimeModes_le, SIGNAL(textChanged(const QString &)),
+    connect(ui->m_minTimeModes_le, SIGNAL(textChanged(const QString&)),
             this, SLOT(m_previewTime_le_changed()));
 
-    connect(ui->m_maxTimeModes_le, SIGNAL(textChanged(const QString &)),
+    connect(ui->m_maxTimeModes_le, SIGNAL(textChanged(const QString&)),
             this, SLOT(m_previewTime_le_changed()));
 
     connect(ui->m_fixedTime_ckb, SIGNAL(stateChanged(int)),
@@ -198,6 +193,8 @@ void GeneratorAepWidget::m_start_pb_clicked()
     m_outPathFiles.clear();
 
     Set& setsInTree = getSetsInTree();
+    ui->m_status_prb->setMaximum(setsInTree.getSetsAep().count());
+
     sortFilesToComplectAep(setsInTree);
     createSet(setsInTree);
     randValuesInFilesAep(m_outPathFiles);
@@ -356,7 +353,7 @@ QString GeneratorAepWidget::generStrBuffer(const QString& inBuff)
     QStringList strList = inBuff.split('\n');
     tempBuff.resize(inBuff.count());
     tempBuff.clear();
-qDebug()<< inBuff;
+
     tempBuff += generOneStrBuffer(inBuff) + '\n';
     strList.pop_front();
     strList.removeAll("");

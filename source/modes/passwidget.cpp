@@ -7,7 +7,7 @@
 PassWidget::PassWidget(QWidget* parent)
             : QWidget(parent)
             , ui(new Ui::PassWidget)
-            , m_password("й")
+            , m_password("СИшник")
 {
     ui->setupUi(this);
     connectSlots();

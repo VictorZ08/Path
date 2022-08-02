@@ -1,4 +1,4 @@
-#include "dataverification.h"
+#include "dataverificationaep.h"
 
 #include <fstream>
 #include <QDebug>
@@ -7,6 +7,7 @@
 #include <algorithm>
 #include <cctype>
 #include <string>
+
 #include <QRegularExpression>
 
 constexpr int limitCountLineFile = 35;
@@ -17,7 +18,7 @@ DataVerificationAep::DataVerificationAep()
     qDebug()<<"Create DataVerificationAep";
 }
 
-QStringList DataVerificationAep::getData()
+QStringList DataVerificationAep::getLog()
 {
     QStringList reportErrors;
     if(m_loadErrors.isEmpty()){

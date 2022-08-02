@@ -5,7 +5,9 @@
 #include "timer.h"
 #include "modes/systemtray.h"
 #include "verification/loggerwidget.h"
-#include "verification/dataverification.h"
+#include "verification/dataverificationaep.h"
+#include "verification/dataverificationpemi.h"
+#include "generator/generatorpemiwidget.h"
 
 #include <QMimeData>
 #include <QDragEnterEvent>
@@ -146,8 +148,6 @@ void TimerInterface::previewTime()
 {
     int timeSet = m_timeSet_le->text().toInt();
     m_beginWorkTime = m_editTime_dte->dateTime();
-    int minTimeModes = m_minTimeModes_le->text().toInt();
-    int maxTimeModes = m_maxTimeModes_le->text().toInt();
     bool checkFixedTime = m_fixedTime_ckb->isChecked();
     m_dateTime.clear();
 
@@ -163,7 +163,7 @@ void TimerInterface::previewTime()
                                           numSets,
                                           timeSet);
     }
-    else if(strObjectName.contains("aep", Qt::CaseInsensitive)){
+    else if(strObjectName.contains("aep", Qt::CaseInsensitive)){       
         if(m_loadSetsTree.getSetsAep().count() != 0) {
 
             int numFilesInSet = m_loadSetsTree.getSetsAep().at(0).second.count();
@@ -181,6 +181,8 @@ void TimerInterface::previewTime()
                 qDebug()<<m_dateTime.back();
             }
             else {
+                int minTimeModes = m_minTimeModes_le->text().toInt();
+                int maxTimeModes = m_maxTimeModes_le->text().toInt();
                 m_dateTime = Random::randTimeAep(m_beginWorkTime,
                                                  numFilesInSet,
                                                  numSets,
@@ -238,6 +240,7 @@ void TimerInterface::clearWiget()
     m_dateTime.clear();
     m_loadSetsTree.clear();
     m_checkStatusLoadTree = true;
+    m_step = 0.0;
 }
 
 /**
@@ -286,19 +289,37 @@ void TimerInterface::startCheckData()
         return;
 
     m_step = 0;
-    DataVerificationAep dv;
     Set& setsTree = getSetsInTree();
-    m_status_prb->setMaximum(setsTree.getSetsAep().count());
-    for(auto& set: setsTree.getSetsAep()) {
-        dv.checkFiles(set.second);
-        emit emitStatus_prb();
-    }
+    QString strObjectName = this->objectName();
+    if(strObjectName.contains("pemi", Qt::CaseInsensitive)){
+        DataVerificationPemi dv;
+        sCoordSerchTable coord;
+        m_status_prb->setMaximum(setsTree.getSetsPemi().count());
+        for(auto& set: setsTree.getSetsPemi()) {
+            dv.checkFile(set, coord);
+            emit emitStatus_prb();
+        }
 
-    m_reportError = dv.getData();
-    if(m_reportError.isEmpty())
-        m_reportCheck_pb->setStyleSheet("background-color: green;");
-    else
-        m_reportCheck_pb->setStyleSheet("background-color: red;");
+        m_reportError = dv.getLog();
+        if(m_reportError.isEmpty())
+            m_reportCheck_pb->setStyleSheet("background-color: green;");
+        else
+            m_reportCheck_pb->setStyleSheet("background-color: red;");
+    }
+    else if(strObjectName.contains("aep", Qt::CaseInsensitive)){
+        DataVerificationAep dv;
+        m_status_prb->setMaximum(setsTree.getSetsAep().count());
+        for(auto& set: setsTree.getSetsAep()) {
+            dv.checkFiles(set.second);
+            emit emitStatus_prb();
+        }
+
+        m_reportError = dv.getLog();
+        if(m_reportError.isEmpty())
+            m_reportCheck_pb->setStyleSheet("background-color: green;");
+        else
+            m_reportCheck_pb->setStyleSheet("background-color: red;");
+    }
 }
 
 /**
