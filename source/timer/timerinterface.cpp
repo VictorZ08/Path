@@ -4,19 +4,24 @@
 #include "random/random.h"
 #include "timer.h"
 #include "modes/systemtray.h"
+#include "verification/loggerwidget.h"
+#include "verification/dataverificationaep.h"
+#include "verification/dataverificationpemi.h"
+#include "generator/generatorpemiwidget.h"
 
 #include <QMimeData>
 #include <QDragEnterEvent>
 #include <QCoreApplication>
 #include <QTreeWidget>
 #include <QLineEdit>
+#include <QCheckBox>
 #include <QDateTimeEdit>
+#include <QProgressBar>
+#include <QPushButton>
 #include <QLabel>
 #include <QDir>
 
 #include <QDebug>
-
-constexpr quint64 kTimeSet = 50;
 
 TimerInterface::TimerInterface(SystemTray* inSysTray,
                                QWidget* inParent)
@@ -141,8 +146,9 @@ void TimerInterface::dropEventTreeWidget()
 */
 void TimerInterface::previewTime()
 {
-    quint64 timeSet = m_timeSet_le->text().toInt();
+    int timeSet = m_timeSet_le->text().toInt();
     m_beginWorkTime = m_editTime_dte->dateTime();
+    bool checkFixedTime = m_fixedTime_ckb->isChecked();
     m_dateTime.clear();
 
     QString strObjectName = this->objectName();
@@ -157,26 +163,39 @@ void TimerInterface::previewTime()
                                           numSets,
                                           timeSet);
     }
-    else if(strObjectName.contains("aep", Qt::CaseInsensitive)){
+    else if(strObjectName.contains("aep", Qt::CaseInsensitive)){       
         if(m_loadSetsTree.getSetsAep().count() != 0) {
 
-            quint64 numFilesInSet = m_loadSetsTree.getSetsAep().at(0).second.count();
-            quint64 numSets;
+            int numFilesInSet = m_loadSetsTree.getSetsAep().at(0).second.count();
+            int numSets;
             if(m_numSets_le != nullptr)
                 numSets = m_numSets_le->text().toInt();
             else
                 numSets = m_loadSetsTree.getSetsAep().count();
 
-            m_dateTime = Random::randTimeAep(m_beginWorkTime,
-                                             numFilesInSet,
-                                             numSets,
-                                             timeSet);
+            if(checkFixedTime == true) {
+                size_t sumFiles = m_loadSetsTree.countFilesAllSetsAep();
+                qDebug()<<sumFiles;
+                m_dateTime = Random::randTimeFixed(m_beginWorkTime,
+                                                   sumFiles);
+                qDebug()<<m_dateTime.back();
+            }
+            else {
+                int minTimeModes = m_minTimeModes_le->text().toInt();
+                int maxTimeModes = m_maxTimeModes_le->text().toInt();
+                m_dateTime = Random::randTimeAep(m_beginWorkTime,
+                                                 numFilesInSet,
+                                                 numSets,
+                                                 minTimeModes,
+                                                 maxTimeModes,
+                                                 timeSet);
+            }
         }
     }
+
     if(!m_dateTime.isEmpty()) {
         m_previewTime_le->setText((m_dateTime.back()).toString("dd.MM.yyyy hh:mm"));
     }
-    statusGeneratesFiles("color: rgb(0, 0, 0)", "Статус:-");
 }
 
 /**
@@ -187,11 +206,16 @@ void TimerInterface::setParentWiget(const QObject* inObj)
 {
     m_loadSets_tw = inObj->findChild<QTreeWidget *>("m_loadSets_tw");
     m_timeSet_le = inObj->findChild<QLineEdit *>("m_timeSet_le");
+    m_minTimeModes_le = inObj->findChild<QLineEdit *>("m_minTimeModes_le");
+    m_maxTimeModes_le = inObj->findChild<QLineEdit *>("m_maxTimeModes_le");
     m_previewTime_le = inObj->findChild<QLineEdit *>("m_previewTime_le");
     m_numSets_le = inObj->findChild<QLineEdit *>("m_numSets_le");
     m_saveSets_le = inObj->findChild<QLineEdit *>("m_saveSets_le");
     m_editTime_dte = inObj->findChild<QDateTimeEdit *>("m_editTime_dte");
-    m_status_l = inObj->findChild<QLabel *>("m_status_l");
+    m_fixedTime_ckb = inObj->findChild<QCheckBox *>("m_fixedTime_ckb");    
+    m_startCheckData_pb = inObj->findChild<QPushButton *>("m_startCheckData_pb");
+    m_reportCheck_pb = inObj->findChild<QPushButton *>("m_reportCheck_pb");
+    m_status_prb = inObj->findChild<QProgressBar *>("m_status_prb");
 
     initCurrentTimeWidget();
 }
@@ -204,7 +228,6 @@ void TimerInterface::initCurrentTimeWidget()
 {
     m_previewTime_le->setText("");
     m_editTime_dte->setDateTime(m_beginWorkTime);
-    m_timeSet_le->setText(QString::number(kTimeSet));
 }
 
 /**
@@ -216,21 +239,8 @@ void TimerInterface::clearWiget()
     m_loadSets_tw->clear();
     m_dateTime.clear();
     m_loadSetsTree.clear();
-    m_timeSet_le->setText(QString::number(kTimeSet));
-}
-
-/**
-    @brief TimerInterface::statusGeneratesFiles
-    Выводит строку стату начала или
-    завершения работы генерации файлов
-    @param inColor Цвет текста
-    @param inStatus Текст
-*/
-void TimerInterface::statusGeneratesFiles(const QString& inColor,
-                                          const QString& inStatus)
-{
-    m_status_l->setStyleSheet(inColor);
-    m_status_l->setText(inStatus);
+    m_checkStatusLoadTree = true;
+    m_step = 0.0;
 }
 
 /**
@@ -245,6 +255,71 @@ size_t TimerInterface::getCountSetsInTree()
     }
     else
         return m_loadSetsTree.countSetsAep();
+}
+
+/**
+    @brief TimerInterface::progressTempStart
+    Увеличивает состояние прогрессбар
+*/
+void TimerInterface::progressTempStart()
+{
+    ++m_step;
+    m_status_prb->setValue(m_step);
+}
+
+/**
+    @brief TimerInterface::reportCheck
+    Вывод отчета
+    @param logger получаем указатель на виджет форму
+*/
+void TimerInterface::reportCheck(LoggerWidget* logger)
+{
+    this->hide();
+    logger->setError(m_reportError);
+    logger->show();
+}
+
+/**
+    @brief TimerInterface::startCheckData
+    Проверка данных в tree на ошибки
+*/
+void TimerInterface::startCheckData()
+{
+    if(getStatusLoadTree() == true)
+        return;
+
+    m_step = 0;
+    Set& setsTree = getSetsInTree();
+    QString strObjectName = this->objectName();
+    if(strObjectName.contains("pemi", Qt::CaseInsensitive)){
+        DataVerificationPemi dv;
+        sCoordSerchTable coord;
+        m_status_prb->setMaximum(setsTree.getSetsPemi().count());
+        for(auto& set: setsTree.getSetsPemi()) {
+            dv.checkFile(set, coord);
+            emit emitStatus_prb();
+        }
+
+        m_reportError = dv.getLog();
+        if(m_reportError.isEmpty())
+            m_reportCheck_pb->setStyleSheet("background-color: green;");
+        else
+            m_reportCheck_pb->setStyleSheet("background-color: red;");
+    }
+    else if(strObjectName.contains("aep", Qt::CaseInsensitive)){
+        DataVerificationAep dv;
+        m_status_prb->setMaximum(setsTree.getSetsAep().count());
+        for(auto& set: setsTree.getSetsAep()) {
+            dv.checkFiles(set.second);
+            emit emitStatus_prb();
+        }
+
+        m_reportError = dv.getLog();
+        if(m_reportError.isEmpty())
+            m_reportCheck_pb->setStyleSheet("background-color: green;");
+        else
+            m_reportCheck_pb->setStyleSheet("background-color: red;");
+    }
 }
 
 /**

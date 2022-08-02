@@ -1,6 +1,7 @@
 #include "ui_generatoraepwidget.h"
 #include "generatoraepwidget.h"
 #include "report/reportaepwidget.h"
+#include "verification/loggerwidget.h"
 
 #include "sortfiles.h"
 #include "random/random.h"
@@ -17,6 +18,7 @@ GeneratorAepWidget::GeneratorAepWidget(SystemTray* inSysTray,
             : TimerInterface(inSysTray, inParent)
             , ui(new Ui::GeneratorAepWidget)
             , m_reportAep(new ReportAepWidget(inSysTray, this))
+            , m_logger(new LoggerWidget(inSysTray, this))
 {
     ui->setupUi(this);
 
@@ -31,8 +33,6 @@ GeneratorAepWidget::GeneratorAepWidget(SystemTray* inSysTray,
     setAcceptDrops(true);
 
     ui->m_loadSets_tw->setAttribute(Qt::WA_AcceptDrops, true);
-    statusGeneratesFiles("color: rgb(0, 0, 0)",
-                         "Статус:-");
 
     qDebug()<<"Create GeneratorAepWidget";
 }
@@ -65,23 +65,44 @@ void GeneratorAepWidget::connectSlots() const
     connect(ui->m_report_pb, SIGNAL(clicked(bool)),
             this, SLOT(m_report_pb_clicked()));
 
-    connect(ui->m_timeSet_le, SIGNAL(textChanged(const QString& )),
+    connect(m_reportAep, SIGNAL(emitBackUi()),
+            this, SLOT(showForm()));
+
+    connect(ui->m_timeSet_le, SIGNAL(textChanged(const QString&)),
             this, SLOT(m_previewTime_le_changed()));
 
-    connect(ui->m_editTime_dte, SIGNAL(dateTimeChanged(const QDateTime& )),
+    connect(ui->m_editTime_dte, SIGNAL(dateTimeChanged(const QDateTime&)),
             this, SLOT(m_previewTime_le_changed()));
 
-    connect(ui->m_numSets_le, SIGNAL(textChanged(const QString& )),
+    connect(ui->m_numSets_le, SIGNAL(textChanged(const QString&)),
             this, SLOT(m_previewTime_le_changed()));
 
     connect(ui->m_amplituda_dsb, SIGNAL(valueChanged(double)),
             this, SLOT(m_amplituda_dsb_changed()));
 
-    connect(m_reportAep, SIGNAL(emitBackUi()),
-            this, SLOT(showForm()));
-
     connect(this, SIGNAL(emitPreviewTime()),
             this, SLOT(m_previewTime_le_changed()));
+
+    connect(ui->m_minTimeModes_le, SIGNAL(textChanged(const QString&)),
+            this, SLOT(m_previewTime_le_changed()));
+
+    connect(ui->m_maxTimeModes_le, SIGNAL(textChanged(const QString&)),
+            this, SLOT(m_previewTime_le_changed()));
+
+    connect(ui->m_fixedTime_ckb, SIGNAL(stateChanged(int)),
+            this, SLOT(m_previewTime_le_changed()));
+
+    connect(ui->m_reportCheck_pb, SIGNAL(clicked(bool)),
+            this, SLOT(m_reportCheck_pb_clicked()));
+
+    connect(ui->m_startCheckData_pb, SIGNAL(clicked(bool)),
+            this, SLOT(m_startCheckData_pb_clicked()));
+
+    connect(this, SIGNAL(emitStatus_prb()), this,
+            SLOT(m_progress_prb_tempStart()), Qt::DirectConnection);
+
+    connect(m_logger, SIGNAL(emitBackUi()),
+            this, SLOT(showForm()));
 }
 
 /**
@@ -99,8 +120,13 @@ void GeneratorAepWidget::initEventFiter()
     ui->m_editTime_dte->installEventFilter(this);
     ui->m_start_pb->installEventFilter(this);
     ui->m_amplituda_dsb->installEventFilter(this);
-    ui->m_back_pb->installEventFilter(this);
-    ui->m_report_pb->installEventFilter(this);
+    ui->m_back_pb->installEventFilter(this);    
+    ui->m_previewTime_le->setEnabled(false);
+    ui->m_startCheckData_pb->installEventFilter(this);
+    ui->m_reportCheck_pb->installEventFilter(this);
+    ui->m_minTimeModes_le->installEventFilter(this);
+    ui->m_maxTimeModes_le->installEventFilter(this);
+    ui->m_fixedTime_ckb->installEventFilter(this);
 }
 
 /**
@@ -131,8 +157,10 @@ void GeneratorAepWidget::m_clear_pb_clicked()
     m_outPathFiles.clear();
     ui->m_saveSets_le->clear();
     ui->m_numSets_le->clear();
-    statusGeneratesFiles("color: rgb(0, 0, 0)",
-                         "Статус:-");
+    ui->m_timeSet_le->setText(QString::number(kTimeSetAep));
+    ui->m_minTimeModes_le->setText(QString::number(kMinTimeModeAep));
+    ui->m_maxTimeModes_le->setText(QString::number(kMaxTimeModeAep));
+    ui->m_status_prb->setValue(0);
 }
 
 /**
@@ -165,17 +193,45 @@ void GeneratorAepWidget::m_start_pb_clicked()
     m_outPathFiles.clear();
 
     Set& setsInTree = getSetsInTree();
+    ui->m_status_prb->setMaximum(setsInTree.getSetsAep().count());
+
     sortFilesToComplectAep(setsInTree);
     createSet(setsInTree);
     randValuesInFilesAep(m_outPathFiles);
     shuffleFiles(setsInTree.getSetsAep());
 
     QVector<QDateTime>::iterator itDT = getDateTime().begin();
-    for(auto& pathFile : m_outPathFiles)
+    for(auto& pathFile : m_outPathFiles) {
         setDateTimeFiles(pathFile, *itDT++);
+        emit emitStatus_prb();
+    }
+}
 
-    statusGeneratesFiles("color: rgb(255, 255, 255)", "Статус: Готов");
+/**
+    @brief GeneratorAepWidget::m_progress_prb_tempStart
+    Увеличивает состояние прогрессбар
+*/
+void GeneratorAepWidget::m_progress_prb_tempStart()
+{
+    progressTempStart();
+}
 
+/**
+    @brief GeneratorAepWidget::m_reportCheck_pb_clicked
+    Вывод отчета
+*/
+void GeneratorAepWidget::m_reportCheck_pb_clicked()
+{
+    reportCheck(m_logger);
+}
+
+/**
+    @brief GeneratorAepWidget::m_startCheckData_pb_clicked
+    Проверка данных в tree на ошибки
+*/
+void GeneratorAepWidget::m_startCheckData_pb_clicked()
+{
+    startCheckData();
 }
 
 /**

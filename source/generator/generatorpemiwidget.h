@@ -7,11 +7,8 @@
 class TableSetsWidget;
 
 struct sCoordSerchTable {
-    int rowStart = 5;
-    int rowEnd = 13;
-    int columnStart = rowStart;
-    int columnEnd = 13;
-
+    int rowStart = 5, columnStart = 5;
+    int rowEnd = 13, columnEnd = 13;
 };
 
 QT_BEGIN_NAMESPACE
@@ -59,6 +56,9 @@ protected slots:
     void m_start_pb_clicked();
     void m_createTable_pb_clicked();
     void m_previewTime_le_textChanged();
+    void m_startCheckData_pb_clicked();
+    void m_progress_prb_tempStart();
+    void m_reportCheck_pb_clicked();
 
     void m_injener_le_textChanged();
     void m_tehnic_le_textChanged();
@@ -74,6 +74,7 @@ signals:
 private:
     Ui::GeneratorPemiWidget* ui = nullptr;
     TableSetsWidget* m_tableSetsWidget = nullptr;
+    LoggerWidget* m_logger = nullptr;
 
     QPair<QStringList, QStringList> m_prDataTitul;
     QFileInfoList m_outExelFiles;

@@ -10,7 +10,6 @@ int main(int argc, char *argv[])
     QApplication::setPalette(QApplication::style()->standardPalette());
 
     QApplication a(argc, argv);
-
     std::unique_ptr<ModesWidget> mw{ new ModesWidget};
 
     return a.exec();
