@@ -1,4 +1,4 @@
-include (C:/Users/Victor/Documents/Path/libs/QtXlsx/QtXlsxWriter-master/QtXlsxWriter-master/src/xlsx/qtxlsx.pri)
+#include (C:/Users/Victor/Documents/Path/libs/QtXlsx/QtXlsxWriter-master/QtXlsxWriter-master/src/xlsx/qtxlsx.pri)
 
 QT       += core gui
 QT       += sql
@@ -90,6 +90,3 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 RESOURCES += \
     path.qrc \
 
-DISTFILES += \
-    диаграмма.qmodel \
-    диаграмма.qmodel \
