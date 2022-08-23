@@ -328,6 +328,8 @@ void GeneratorPemiWidget::m_amplituda_sb_textChanged()
 */
 void GeneratorPemiWidget::m_start_pb_clicked()
 {
+    TimerInterface::m_step = 0.0;
+    ui->m_status_prb->setValue(m_step);
     initDataTitul();
     m_outExelFiles.clear();
     QString saveSets = ui->m_saveSets_le->text();

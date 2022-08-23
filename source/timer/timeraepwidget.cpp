@@ -138,13 +138,15 @@ void TimerAepWidget::m_previewTime_le_changed()
 */
 void TimerAepWidget::m_start_pb_clicked()
 {
-    QVector<QDateTime>::iterator itDateTime = getDateTime().begin();
-
+    TimerInterface::m_step = 0.0;
+    ui->m_status_prb->setValue(m_step);
     Set& setsTree = getSetsInTree();
     ui->m_status_prb->setMaximum(setsTree.getSetsAep().count());
 
     shuffleFiles(setsTree.getSetsAep());
     sortFilesToComplectAep(setsTree);
+
+    QVector<QDateTime>::iterator itDateTime = getDateTime().begin();
     for(auto& set: setsTree.getSetsAep()) {
         emit emitStatus_prb();
         setDateTimeFiles(set.first, *itDateTime++);

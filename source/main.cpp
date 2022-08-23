@@ -2,10 +2,12 @@
 
 #include "style.h"
 #include "modes/modeswidget.h"
+#include <memory>
 
 int main(int argc, char *argv[])
 {
     Q_INIT_RESOURCE(path);
+
     QApplication::setStyle(new Style);
     QApplication::setPalette(QApplication::style()->standardPalette());
 

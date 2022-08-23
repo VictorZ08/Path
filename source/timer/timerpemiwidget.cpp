@@ -160,6 +160,8 @@ void TimerPemiWidget::m_back_pb_clicked()
 */
 void TimerPemiWidget::m_start_pb_clicked()
 {
+    TimerInterface::m_step = 0.0;
+    ui->m_status_prb->setValue(m_step);
     Set& setsTree = getSetsInTree();
     ui->m_status_prb->setMaximum(setsTree.getSetsPemi().count());
 

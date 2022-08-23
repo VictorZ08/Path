@@ -23,11 +23,13 @@
 
 #include <QDebug>
 
+double TimerInterface::m_step = 0.0;
+
 TimerInterface::TimerInterface(SystemTray* inSysTray,
                                QWidget* inParent)
         : QDialog(inParent)
         , m_sysTray{inSysTray}
-        , m_beginWorkTime{getWorkDateTime()}
+        , m_beginWorkTime{getWorkDateTime()}        
 {
     qDebug()<<"Create TimerInterface";
 }
@@ -153,15 +155,23 @@ void TimerInterface::previewTime()
 
     QString strObjectName = this->objectName();
     if(strObjectName.contains("pemi", Qt::CaseInsensitive)){
-        quint64 numSets;
-        if(m_numSets_le != nullptr)
-            numSets = m_numSets_le->text().toInt();
-        else
-            numSets = m_loadSetsTree.getSetsPemi().count();
+        if(m_loadSetsTree.getSetsPemi().count() != 0) {
+            quint64 numSets;
+            if(m_numSets_le != nullptr)
+                numSets = m_numSets_le->text().toInt();
+            else
+                numSets = m_loadSetsTree.getSetsPemi().count();
 
-        m_dateTime = Random::randTimePemi(m_beginWorkTime,
-                                          numSets,
-                                          timeSet);
+            if(checkFixedTime == true) {
+                m_dateTime = Random::randTimeFixed(m_beginWorkTime,
+                                                   numSets);
+            }
+            else {
+                m_dateTime = Random::randTimePemi(m_beginWorkTime,
+                                                  numSets,
+                                                  timeSet);
+            }
+        }
     }
     else if(strObjectName.contains("aep", Qt::CaseInsensitive)){       
         if(m_loadSetsTree.getSetsAep().count() != 0) {

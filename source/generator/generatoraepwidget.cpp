@@ -190,6 +190,8 @@ void GeneratorAepWidget::m_previewTime_le_changed()
 */
 void GeneratorAepWidget::m_start_pb_clicked()
 {
+    TimerInterface::m_step = 0.0;
+    ui->m_status_prb->setValue(m_step);
     m_outPathFiles.clear();
 
     Set& setsInTree = getSetsInTree();
@@ -198,10 +200,10 @@ void GeneratorAepWidget::m_start_pb_clicked()
     sortFilesToComplectAep(setsInTree);
     createSet(setsInTree);
     randValuesInFilesAep(m_outPathFiles);
-    shuffleFiles(setsInTree.getSetsAep());
+    shuffleFiles(setsInTree.getSetsAep());//setsInTree - заменить на доработанный контейнер
 
     QVector<QDateTime>::iterator itDT = getDateTime().begin();
-    for(auto& pathFile : m_outPathFiles) {
+    for(auto& pathFile : m_outPathFiles) { //Доработать контейнер!!!
         setDateTimeFiles(pathFile, *itDT++);
         emit emitStatus_prb();
     }

@@ -365,13 +365,6 @@
          <item>
           <layout class="QVBoxLayout" name="verticalLayout_4">
            <item>
-            <widget class="QCheckBox" name="m_fixedTime_ckb">
-             <property name="text">
-              <string>Зафиксировать время</string>
-             </property>
-            </widget>
-           </item>
-           <item>
             <widget class="QCheckBox" name="m_multiplisity_ckb">
              <property name="text">
               <string>Кратность 0,5</string>
